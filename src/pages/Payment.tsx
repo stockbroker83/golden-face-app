@@ -45,6 +45,7 @@ const Payment = () => {
         orderName: "타로 AI 마스터 프리미엄",
         successUrl: window.location.origin + "/payment/success",
         failUrl: window.location.origin + "/payment/fail",
+        windowTarget: "self",
         card: {
           useEscrow: false,
           flowMode: "DEFAULT",
