@@ -199,7 +199,7 @@ const TarotChat = () => {
 
       // Check premium
       const count = incrementReadingCount();
-      if (count >= 2) {
+      if (count >= 2 && localStorage.getItem("isPremium") !== "true") {
         setTimeout(() => setShowPremium(true), 1500);
       }
     } catch (e) {

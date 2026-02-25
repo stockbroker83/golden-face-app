@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface PremiumBottomSheetProps {
   open: boolean;
@@ -7,16 +7,14 @@ interface PremiumBottomSheetProps {
 }
 
 const PremiumBottomSheet = ({ open, onClose }: PremiumBottomSheetProps) => {
-  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  if (!open) return null;
+  // Don't show if already premium
+  if (!open || localStorage.getItem("isPremium") === "true") return null;
 
   const handlePurchase = () => {
-    toast({
-      title: "준비 중입니다 🙏",
-      description: "결제 기능 준비 중입니다. 곧 만나요!",
-    });
     onClose();
+    navigate("/payment");
   };
 
   return (
