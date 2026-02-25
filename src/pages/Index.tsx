@@ -69,7 +69,7 @@ const Index = () => {
 
         {/* Footer */}
         <footer className="pb-8 text-center opacity-0 animate-fade-in-up" style={{ animationDelay: "900ms" }}>
-          <div className="border-t border-border pt-5">
+          <div className="border-t border-border pt-5 space-y-3">
             <p className="text-muted-foreground text-xs leading-relaxed">
               타로 카드를 선택하면 AI 타로 마스터가
               <br />
@@ -77,6 +77,25 @@ const Index = () => {
               <br />
               <span className="text-primary/70">오늘의 운세를 확인해보세요 ✦</span>
             </p>
+            <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+              <button
+                onClick={() => alert("이용약관\n\n제1조 (목적)\n본 약관은 타로 AI 마스터(이하 '서비스')가 제공하는 AI 타로 상담 서비스의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.\n\n제2조 (서비스 내용)\n서비스는 AI 기반 타로 카드 리딩 및 상담을 제공합니다. 상담 결과는 오락 목적이며, 전문적인 조언을 대체하지 않습니다.\n\n제3조 (결제 및 환불)\n프리미엄 서비스 결제 후 7일 이내 미사용 시 전액 환불이 가능합니다.")}
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+              >
+                이용약관
+              </button>
+              <span className="text-border">|</span>
+              <button
+                onClick={() => alert("개인정보처리방침\n\n1. 수집하는 개인정보 항목\n- 결제 정보: 주문번호, 결제금액\n- 이용 기록: 상담 내역, 서비스 이용 기록\n\n2. 개인정보의 수집 및 이용 목적\n- 서비스 제공 및 운영\n- 결제 처리 및 환불\n\n3. 개인정보의 보유 및 이용 기간\n- 서비스 이용 종료 시까지 또는 관련 법령에 따른 보관 기간\n\n4. 문의\n- 이메일: support@tarotai.kr")}
+                className="underline underline-offset-2 hover:text-foreground transition-colors"
+              >
+                개인정보처리방침
+              </button>
+            </div>
+            <div className="text-[10px] text-muted-foreground/60 space-y-0.5">
+              <p>서비스명: 타로 AI 마스터 | 운영: 협시입니다 저하로</p>
+              <p>고객센터: support@tarotai.kr</p>
+            </div>
           </div>
         </footer>
       </div>
