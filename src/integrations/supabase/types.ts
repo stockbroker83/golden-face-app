@@ -50,6 +50,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          payment_key: string | null
+          session_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          payment_key?: string | null
+          session_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          payment_key?: string | null
+          session_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       tarot_readings: {
         Row: {
           answer: string | null
