@@ -23,7 +23,7 @@ const Payment = () => {
 
     try {
       const { loadTossPayments } = await import("@tosspayments/tosspayments-sdk");
-      const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+      const clientKey = "test_ck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
       const orderId = "TAROT_" + Date.now();
 
       // Save pending payment to DB
