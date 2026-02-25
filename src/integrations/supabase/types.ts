@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      payments: {
+        Row: {
+          amount: number
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          order_id: string
+          order_name: string | null
+          payment_key: string | null
+          session_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          order_id: string
+          order_name?: string | null
+          payment_key?: string | null
+          session_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          order_id?: string
+          order_name?: string | null
+          payment_key?: string | null
+          session_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       tarot_readings: {
         Row: {
           answer: string | null
