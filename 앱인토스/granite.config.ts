@@ -15,7 +15,7 @@ export default defineConfig({
       build: "npm run build",
     },
   },
-  permissions: ["IAP", "Storage", "Notification"],
+  permissions: [],
   webViewProps: {
     type: "partner",
   },
