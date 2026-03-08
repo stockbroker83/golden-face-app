@@ -28,7 +28,7 @@ const FAQS = [
 ];
 
 const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "";
-const TOSS_CONFIRM_API_URL = import.meta.env.VITE_TOSS_CONFIRM_API_URL || "";
+const TOSS_CONFIRM_API_URL = import.meta.env.VITE_TOSS_CONFIRM_API_URL || "/api/toss/confirm";
 const TOSS_SCRIPT_URL = "https://js.tosspayments.com/v1/payment";
 
 declare global {

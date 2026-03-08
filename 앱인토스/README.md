@@ -18,13 +18,28 @@ bun install
 cp .env.example .env.local
 ```
 
-2. `.env.local`에 Claude API 키를 추가합니다:
+2. `.env.local`에 API 키/결제 키를 추가합니다:
 
 ```
 VITE_ANTHROPIC_API_KEY=your_actual_api_key_here
+VITE_TOSS_CLIENT_KEY=your_toss_client_key
+VITE_TOSS_CONFIRM_API_URL=/api/toss/confirm
+TOSS_SECRET_KEY=your_toss_secret_key
 ```
 
 Claude API 키는 [Anthropic Console](https://console.anthropic.com)에서 얻을 수 있습니다.
+
+토스페이먼츠 키는 Toss Payments 개발자센터에서 발급받을 수 있습니다.
+
+## 토스 결제 승인 API
+
+프로젝트에는 서버 승인 엔드포인트가 포함되어 있습니다.
+
+- 경로: `api/toss/confirm.js`
+- 역할: `paymentKey`, `orderId`, `amount`를 받아 토스 결제 승인 API를 서버에서 호출
+- 필수 서버 환경변수: `TOSS_SECRET_KEY`
+
+주의: `TOSS_SECRET_KEY`는 절대 `VITE_` 접두사로 프론트에 노출하면 안 됩니다.
 
 ## 개발 서버 실행
 
