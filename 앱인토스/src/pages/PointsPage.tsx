@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IAP } from "@apps-in-toss/web-framework";
 import { PointsData } from "../types";
-import { addPoints, savePoints } from "../utils/pointsManager";
+import { addPoints, loadPoints, savePoints } from "../utils/pointsManager";
 import "../styles/PointsPage.css";
 
 interface Props {
@@ -26,6 +26,8 @@ type PointPackage = {
   popular?: boolean;
 };
 
+const PROCESSED_ORDER_IDS_KEY = "golden_face_processed_point_orders";
+
 function getUnitPrice(points: number, price: number): string {
   return `개당 ₩${(price / points).toFixed(1)}`;
 }
@@ -39,11 +41,39 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
 
+  const hasProcessedOrder = (orderId: string) => {
+    try {
+      const raw = localStorage.getItem(PROCESSED_ORDER_IDS_KEY);
+      if (!raw) return false;
+      const ids = JSON.parse(raw) as string[];
+      return ids.includes(orderId);
+    } catch {
+      return false;
+    }
+  };
+
+  const markOrderAsProcessed = (orderId: string) => {
+    try {
+      const raw = localStorage.getItem(PROCESSED_ORDER_IDS_KEY);
+      const ids = raw ? (JSON.parse(raw) as string[]) : [];
+      const merged = [orderId, ...ids.filter((id) => id !== orderId)].slice(0, 100);
+      localStorage.setItem(PROCESSED_ORDER_IDS_KEY, JSON.stringify(merged));
+    } catch {
+      localStorage.setItem(PROCESSED_ORDER_IDS_KEY, JSON.stringify([orderId]));
+    }
+  };
+
   const grantPointsFromPurchase = (pkg: PointPackage, orderId: string) => {
+    if (hasProcessedOrder(orderId)) {
+      return;
+    }
+
     const totalPoints = getTotalPoints(pkg);
-    const updated = addPoints(points, totalPoints, `${pkg.name} 충전`, "💳");
+    const latestPoints = loadPoints() || points;
+    const updated = addPoints(latestPoints, totalPoints, `${pkg.name} 충전`, "💳");
     savePoints(updated);
     onUpdatePoints(updated);
+    markOrderAsProcessed(orderId);
     localStorage.setItem(
       "golden_face_last_points_purchase",
       JSON.stringify({ orderId, sku: pkg.sku, points: totalPoints, purchasedAt: new Date().toISOString() })
