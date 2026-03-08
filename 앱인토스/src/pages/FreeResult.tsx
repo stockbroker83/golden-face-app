@@ -274,7 +274,7 @@ export default function FreeResult({ analysis, imageFile, onUpgrade, onBack }: P
 
             <div className="paywall-cta-box">
               <div className="lock-mark">🔒</div>
-              <PricingCard salePrice={18900} originalPrice={25000} />
+              <PricingCard salePrice={9900} originalPrice={25000} />
             </div>
           </div>
         </section>
@@ -284,7 +284,7 @@ export default function FreeResult({ analysis, imageFile, onUpgrade, onBack }: P
         <p className="sticky-timer">⏰ {formatCountdown(secondsLeft)} 후 정가 전환!</p>
         <p className="sticky-viewers">지금 {viewerCount}명이 보고 있어요</p>
         <button className="sticky-upgrade-cta" onClick={onUpgrade}>
-          <strong>₩18,900로 인생 바뀔 9가지 비밀 확인하기</strong>
+          <strong>₩9,900로 인생 바뀔 9가지 비밀 확인하기</strong>
           <span>92%가 '인생이 바뀌었다'고 평가</span>
         </button>
       </div>
@@ -297,7 +297,7 @@ export default function FreeResult({ analysis, imageFile, onUpgrade, onBack }: P
 
             <div className="exit-offer-content">
               <p className="today-special">[오늘만 특가]</p>
-              <p className="price-drop">₩25,000 → ₩18,900 (24% 할인)</p>
+              <p className="price-drop">₩25,000 → ₩9,900 (60% 할인)</p>
               <p>✅ 지금 바로 결제 시:</p>
               <ul>
                 <li>+ 복주머니 100포인트 추가 증정</li>
@@ -307,7 +307,7 @@ export default function FreeResult({ analysis, imageFile, onUpgrade, onBack }: P
             </div>
 
             <div className="exit-offer-actions">
-              <button className="exit-upgrade-btn" onClick={onUpgrade}>₩18,900로 확인하기</button>
+              <button className="exit-upgrade-btn" onClick={onUpgrade}>₩9,900로 확인하기</button>
               <button className="exit-later-btn" onClick={onBack}>다음에 할게요</button>
             </div>
           </div>

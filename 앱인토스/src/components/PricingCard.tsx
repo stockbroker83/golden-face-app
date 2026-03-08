@@ -17,7 +17,7 @@ function getMidnightCountdown() {
   return { hours, minutes, seconds };
 }
 
-export default function PricingCard({ salePrice = 18900, originalPrice = 25000 }: PricingCardProps) {
+export default function PricingCard({ salePrice = 9900, originalPrice = 25000 }: PricingCardProps) {
   const [timeLeft, setTimeLeft] = useState(getMidnightCountdown());
 
   const buyers = useMemo(() => 900 + Math.floor(Math.random() * 601), []);
