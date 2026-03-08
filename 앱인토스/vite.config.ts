@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: '/golden-face-app/',
+  base: mode === 'production' ? '/golden-face-app/' : '/',
   server: {
     port: 8081,
     hmr: {
@@ -15,4 +15,4 @@ export default defineConfig({
     assetsDir: 'assets',
     sourcemap: false,
   }
-})
+}))
