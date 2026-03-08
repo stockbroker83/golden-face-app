@@ -212,7 +212,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
               <strong>오늘의 관상</strong>
               <span>데일리 운세 (1회)</span>
             </div>
-            <span className="earn-amount cost">-30</span>
+            <span className="earn-amount cost">-20</span>
           </div>
           <div className="earn-item cost-item">
             <span className="earn-emoji">👁️</span>
@@ -220,7 +220,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
               <strong>AI 관상 12부위</strong>
               <span>프리미엄 분석 (1회)</span>
             </div>
-            <span className="earn-amount cost">-30</span>
+            <span className="earn-amount cost">-50</span>
           </div>
           <div className="earn-item cost-item">
             <span className="earn-emoji">💕</span>
@@ -228,7 +228,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
               <strong>궁합 분석</strong>
               <span>상대와의 궁합</span>
             </div>
-            <span className="earn-amount cost">-15</span>
+            <span className="earn-amount cost">-30</span>
           </div>
           <div className="earn-item cost-item">
             <span className="earn-emoji">🧠</span>

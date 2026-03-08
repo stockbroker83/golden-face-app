@@ -249,12 +249,12 @@ export function getDefaultPointsData(): PointsData {
 // Daily Usage Limits & Checks
 // ==========================================
 export const USAGE_LIMITS = {
-  daily_fortune: { cost: 30, limit: 5 },
-  compatibility: { cost: 15, limit: 3 },
+  daily_fortune: { cost: 20, limit: 5 },
+  compatibility: { cost: 30, limit: 3 },
   psych_test: { cost: 15, limit: 5 },
   saju: { cost: 100, limit: 2 },
   tarot_chat: { cost: 50, limit: 10 },
-  face_reading_12: { cost: 30, limit: 1 },
+  face_reading_12: { cost: 50, limit: 1 },
 };
 
 export type UsageType = keyof typeof USAGE_LIMITS;

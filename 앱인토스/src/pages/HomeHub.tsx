@@ -95,7 +95,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>오늘의 관상</h3>
           <p>매일 달라지는 운세 흐름을<br />관상으로 확인해요</p>
-          <div className="card-points">-30 🏮</div>
+          <div className="card-points">-20 🏮</div>
         </button>
 
         {/* 2. 관상 분석 (기존) */}
@@ -106,7 +106,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>AI 관상 분석</h3>
           <p>사진 1장으로<br />12부위 상세 분석</p>
-          <div className="card-points">+10 🏮</div>
+          <div className="card-points">-50 🏮</div>
         </button>
 
         {/* 3. 궁합 분석 */}
@@ -118,7 +118,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>궁합 분석</h3>
           <p>두 사람의 관상으로<br />궁합을 확인해요</p>
-          <div className="card-points">-15 🏮</div>
+          <div className="card-points">-30 🏮</div>
         </button>
 
         {/* 4. 심리테스트 */}
@@ -143,7 +143,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>사주팔자</strong>
               <span>천간지지 & 대운 분석</span>
             </div>
-            <span className="mini-points">+20 🏮</span>
+            <span className="mini-points">-20 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("saju_compatibility")}>
@@ -152,7 +152,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>사주 궁합</strong>
               <span>2인 사주 비교 분석</span>
             </div>
-            <span className="mini-points">+25 🏮</span>
+            <span className="mini-points">-25 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("lucky_numbers")}>
@@ -161,7 +161,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운의 번호</strong>
               <span>사주 기반 번호 추천</span>
             </div>
-            <span className="mini-points">+10 🏮</span>
+            <span className="mini-points">-10 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("charm")}>
@@ -170,7 +170,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운 부적</strong>
               <span>오늘의 행운 부적</span>
             </div>
-            <span className="mini-points">+10 🏮</span>
+            <span className="mini-points">-10 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("tojeong")}>
@@ -179,7 +179,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>토정비결</strong>
               <span>2026년 월별 운세</span>
             </div>
-            <span className="mini-points">+15 🏮</span>
+            <span className="mini-points">-15 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("dream")}>
@@ -188,7 +188,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>꿈해몽</strong>
               <span>꿈 풀이 해석</span>
             </div>
-            <span className="mini-points">+10 🏮</span>
+            <span className="mini-points">-10 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("lucky_style")}>
@@ -197,7 +197,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운의 코디</strong>
               <span>오늘의 스타일 추천</span>
             </div>
-            <span className="mini-points">+5 🏮</span>
+            <span className="mini-points">-5 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("wish_wall")}>
