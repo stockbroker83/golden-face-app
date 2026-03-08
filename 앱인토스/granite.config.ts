@@ -1,7 +1,7 @@
 import { defineConfig } from "@apps-in-toss/web-framework/config";
 
 export default defineConfig({
-  appName: "tarot-ai-master",
+  appName: "golden-face",
   brand: {
     displayName: "금빛관상",
     primaryColor: "#F5C842",
@@ -9,13 +9,13 @@ export default defineConfig({
   },
   web: {
     host: "localhost",
-    port: 5173,
+    port: 8081,
     commands: {
       dev: "npm run dev",
       build: "npm run build",
     },
   },
-  permissions: [],
+  permissions: ["IAP", "Storage", "Notification"],
   webViewProps: {
     type: "partner",
   },
