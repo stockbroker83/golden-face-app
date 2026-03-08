@@ -206,7 +206,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>소원의 담벼락</strong>
               <span>소원 적고 응원받기</span>
             </div>
-            <span className="mini-points">+10 🏮</span>
+            <span className="mini-points">+1 🏮</span>
           </button>
         </div>
       </section>
