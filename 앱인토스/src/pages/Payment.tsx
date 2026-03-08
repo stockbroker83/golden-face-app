@@ -14,7 +14,8 @@ interface Props {
   onBack: () => void;
 }
 
-const PREMIUM_POINTS_PRICE = 2300;
+const PREMIUM_POINTS_PRICE = 2200;
+const PREMIUM_CASH_PRICE = 9900;
 
 const BENEFITS = [
   "관상 12가지 상세 분석",
@@ -173,7 +174,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
     const baseUrl = `${window.location.origin}${window.location.pathname}`;
 
     await tossPayments.requestPayment("카드", {
-      amount: 18900,
+      amount: PREMIUM_CASH_PRICE,
       orderId,
       orderName: "금빛관상 프리미엄 운세 리포트",
       customerName: "금빛관상 고객",
@@ -313,7 +314,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
           ))}
         </ul>
 
-        <PricingCard salePrice={18900} originalPrice={25000} />
+        <PricingCard salePrice={PREMIUM_CASH_PRICE} originalPrice={25000} />
 
         <section className="premium-benefit-box">
           <h4>🎁 프리미엄 구매 시 즉시 받는 5가지 특전</h4>
@@ -325,7 +326,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
             <li>✅ 궁합/심리테스트 무제한 (₩15,000 상당)</li>
           </ul>
           <p className="benefit-total">총 가치: ₩123,700</p>
-          <p className="benefit-sale">→ 오늘만 ₩18,900 (84% 할인!)</p>
+          <p className="benefit-sale">→ 오늘만 ₩9,900</p>
         </section>
 
         {error && <div className="error-message">⚠️ {error}</div>}
@@ -337,7 +338,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
         )}
 
         <button className="btn-payment" onClick={handlePayment} disabled={isProcessing}>
-          {isProcessing ? "결제 처리 중..." : "₩18,900로 전체 운세 확인하기"}
+          {isProcessing ? "결제 처리 중..." : `₩${PREMIUM_CASH_PRICE.toLocaleString()}로 전체 운세 확인하기`}
         </button>
 
         <button className="btn-points-payment" onClick={handlePointsPayment} disabled={isProcessing}>
