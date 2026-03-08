@@ -165,6 +165,24 @@
   cursor: not-allowed;
 }
 
+.btn-points-payment {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid #d4af37;
+  border-radius: 14px;
+  padding: 14px;
+  color: #7c2d12;
+  font-size: 15px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff7d6 0%, #ffe9a8 100%);
+  cursor: pointer;
+}
+
+.btn-points-payment:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .faq-section {
   margin-top: 16px;
   border-top: 1px solid #e5e7eb;

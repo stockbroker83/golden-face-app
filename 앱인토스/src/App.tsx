@@ -261,6 +261,13 @@ function App() {
 
       {appState.current_step === "payment" && (
         <Payment
+          points={appState.points}
+          onUpdatePoints={(updatedPoints: PointsData) => {
+            setAppState((prev) => ({
+              ...prev,
+              points: updatedPoints,
+            }));
+          }}
           onPaymentSuccess={handlePaymentComplete}
           onBack={() => goToStep("free")}
         />
