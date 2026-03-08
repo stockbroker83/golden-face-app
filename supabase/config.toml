@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.confirm-payment]
 verify_jwt = false
+
+[functions.account-state]
+verify_jwt = false
+
+[functions.account-points-sync]
+verify_jwt = false
+
+[functions.account-vip-grant]
+verify_jwt = false

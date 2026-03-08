@@ -3,6 +3,9 @@ import { PointsData, VIPMembership } from "../types";
 const ACCOUNT_API_BASE_URL = import.meta.env.VITE_ACCOUNT_API_BASE_URL || "";
 const USER_ID_KEY = "golden_face_user_id";
 const VIP_KEY = "golden_face_vip";
+const STATE_ENDPOINT = "/account-state";
+const POINTS_SYNC_ENDPOINT = "/account-points-sync";
+const VIP_GRANT_ENDPOINT = "/account-vip-grant";
 
 interface AccountStatePayload {
   points?: PointsData;
@@ -66,7 +69,7 @@ export async function fetchServerAccountState(): Promise<AccountStatePayload | n
   try {
     const userId = getOrCreateUserId();
     const response = await withTimeout(
-      fetch(`${ACCOUNT_API_BASE_URL}/account/state?userId=${encodeURIComponent(userId)}`),
+      fetch(`${ACCOUNT_API_BASE_URL}${STATE_ENDPOINT}?userId=${encodeURIComponent(userId)}`),
       2500
     );
 
@@ -81,7 +84,7 @@ export async function syncPointsToServer(points: PointsData): Promise<void> {
   if (!ACCOUNT_API_BASE_URL) return;
 
   try {
-    await fetch(`${ACCOUNT_API_BASE_URL}/account/points/sync`, {
+    await fetch(`${ACCOUNT_API_BASE_URL}${POINTS_SYNC_ENDPOINT}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -98,7 +101,7 @@ export async function grantVipOnServer(vip: VIPMembership): Promise<void> {
   if (!ACCOUNT_API_BASE_URL) return;
 
   try {
-    await fetch(`${ACCOUNT_API_BASE_URL}/account/vip/grant`, {
+    await fetch(`${ACCOUNT_API_BASE_URL}${VIP_GRANT_ENDPOINT}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
