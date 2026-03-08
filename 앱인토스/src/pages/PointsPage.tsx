@@ -19,9 +19,10 @@ const REWARDS = [
 ];
 
 const POINT_PACKAGES = [
-  { sku: "points_100", name: "복주머니 100개", points: 100, price: 3900, bonus: 0 },
-  { sku: "points_350", name: "복주머니 300+50", points: 350, price: 9900, bonus: 50, popular: true },
-  { sku: "points_800", name: "복주머니 700+100", points: 800, price: 19900, bonus: 100 },
+  { sku: "points_starter_100", name: "입문팩", points: 100, price: 1000, bonus: 0 },
+  { sku: "points_popular_600", name: "인기팩", points: 600, price: 5000, bonus: 100, popular: true },
+  { sku: "points_premium_1300", name: "프리미엄팩", points: 1300, price: 10000, bonus: 300 },
+  { sku: "points_mega_4200", name: "메가팩", points: 4200, price: 30000, bonus: 1200 },
 ] as const;
 
 type PointPackage = {
@@ -32,6 +33,10 @@ type PointPackage = {
   bonus: number;
   popular?: boolean;
 };
+
+function getUnitPrice(points: number, price: number): string {
+  return `개당 ₩${(price / points).toFixed(1)}`;
+}
 
 export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
   const [isPurchasing, setIsPurchasing] = useState<string | null>(null);
@@ -149,6 +154,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
                 <span className="topup-price">₩{pkg.price.toLocaleString()}</span>
                 {pkg.bonus > 0 && <span className="topup-bonus">보너스 +{pkg.bonus}</span>}
               </div>
+              <div className="topup-unit-price">{getUnitPrice(pkg.points, pkg.price)}</div>
               <button
                 className="topup-btn"
                 onClick={() => handleBuyPoints(pkg)}
