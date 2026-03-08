@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { IAP } from "@apps-in-toss/web-framework";
 import { PointsData } from "../types";
 import { addPoints, savePoints } from "../utils/pointsManager";
 import TossAdRewardButton from "../components/TossAdRewardButton";
@@ -16,12 +18,84 @@ const REWARDS = [
   { name: "오늘의 특별 운세", cost: 50, emoji: "⭐", available: true },
 ];
 
+const POINT_PACKAGES = [
+  { sku: "points_100", name: "복주머니 100개", points: 100, price: 3900, bonus: 0 },
+  { sku: "points_350", name: "복주머니 300+50", points: 350, price: 9900, bonus: 50, popular: true },
+  { sku: "points_800", name: "복주머니 700+100", points: 800, price: 19900, bonus: 100 },
+] as const;
+
+type PointPackage = {
+  sku: string;
+  name: string;
+  points: number;
+  price: number;
+  bonus: number;
+  popular?: boolean;
+};
+
 export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
+  const [isPurchasing, setIsPurchasing] = useState<string | null>(null);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
+
   const handleTossAdReward = (rewardPoints: number) => {
     const updated = addPoints(points, rewardPoints, "광고 시청", "📺");
     savePoints(updated);
     onUpdatePoints(updated);
   };
+
+  const grantPointsFromPurchase = (pkg: PointPackage, orderId: string) => {
+    const updated = addPoints(points, pkg.points, `${pkg.name} 충전`, "💳");
+    savePoints(updated);
+    onUpdatePoints(updated);
+    localStorage.setItem(
+      "golden_face_last_points_purchase",
+      JSON.stringify({ orderId, sku: pkg.sku, points: pkg.points, purchasedAt: new Date().toISOString() })
+    );
+  };
+
+  const handleBuyPoints = (pkg: PointPackage) => {
+    setPurchaseError(null);
+    setPurchaseSuccess(null);
+    setIsPurchasing(pkg.sku);
+
+    try {
+      const cleanup = IAP.createOneTimePurchaseOrder({
+        options: {
+          sku: pkg.sku,
+          processProductGrant: ({ orderId }) => {
+            grantPointsFromPurchase(pkg, orderId);
+            return true;
+          },
+        },
+        onEvent: () => {
+          setPurchaseSuccess(`${pkg.name} 충전 완료! (+${pkg.points} 복주머니)`);
+          setIsPurchasing(null);
+          cleanup?.();
+        },
+        onError: (err: any) => {
+          const code = String(err?.code || err?.message || "");
+          if (code.includes("USER_CANCEL") || code.toLowerCase().includes("cancel")) {
+            setPurchaseError("결제가 취소되었습니다.");
+          } else {
+            setPurchaseError("결제 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+          }
+          setIsPurchasing(null);
+          cleanup?.();
+        },
+      });
+    } catch {
+      setPurchaseError("현재 환경에서는 결제를 시작할 수 없습니다. 앱인토스 환경에서 다시 시도해주세요.");
+      setIsPurchasing(null);
+    }
+  };
+
+  const handleDevTopup = (pkg: PointPackage) => {
+    const orderId = `DEV_POINTS_${Date.now()}`;
+    grantPointsFromPurchase(pkg, orderId);
+    setPurchaseSuccess(`테스트 충전 완료! (+${pkg.points} 복주머니)`);
+  };
+
   return (
     <div className="points-page">
       <header className="points-header">
@@ -52,6 +126,48 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
       <section className="toss-ad-section">
         <div className="ad-container">
           <TossAdRewardButton onReward={handleTossAdReward} />
+        </div>
+      </section>
+
+      {/* 복주머니 충전 */}
+      <section className="topup-section">
+        <h2>충전하기</h2>
+        <p className="topup-desc">결제로 복주머니를 즉시 충전할 수 있어요.</p>
+
+        {purchaseError && <div className="topup-alert error">⚠️ {purchaseError}</div>}
+        {purchaseSuccess && <div className="topup-alert success">✅ {purchaseSuccess}</div>}
+
+        <div className="topup-list">
+          {POINT_PACKAGES.map((pkg: PointPackage) => (
+            <div key={pkg.sku} className={`topup-card ${pkg.popular ? "popular" : ""}`}>
+              {pkg.popular && <span className="topup-badge">인기</span>}
+              <div className="topup-main">
+                <strong>{pkg.name}</strong>
+                <span>🏮 {pkg.points}개</span>
+              </div>
+              <div className="topup-meta">
+                <span className="topup-price">₩{pkg.price.toLocaleString()}</span>
+                {pkg.bonus > 0 && <span className="topup-bonus">보너스 +{pkg.bonus}</span>}
+              </div>
+              <button
+                className="topup-btn"
+                onClick={() => handleBuyPoints(pkg)}
+                disabled={isPurchasing !== null}
+              >
+                {isPurchasing === pkg.sku ? "결제 진행 중..." : "충전하기"}
+              </button>
+
+              {import.meta.env.DEV && (
+                <button
+                  className="topup-dev-btn"
+                  onClick={() => handleDevTopup(pkg)}
+                  disabled={isPurchasing !== null}
+                >
+                  테스트 충전
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -144,7 +260,9 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
                   <strong>{item.action}</strong>
                   <span>{item.date}</span>
                 </div>
-                <span className="history-points">+{item.points}</span>
+                <span className={`history-points ${item.points >= 0 ? "plus" : "minus"}`}>
+                  {item.points > 0 ? `+${item.points}` : item.points}
+                </span>
               </div>
             ))}
           </div>

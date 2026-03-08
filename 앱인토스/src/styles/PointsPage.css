@@ -164,6 +164,152 @@
   font-weight: 600;
   color: #10b981;
 }
+
+.history-points.minus {
+  color: #f87171;
+}
+
+.history-points.plus {
+  color: #10b981;
+}
+
+/* ── 포인트 충전 섹션 ── */
+.topup-section {
+  padding: 24px 20px 0;
+}
+
+.topup-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.topup-desc {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: rgba(240, 236, 228, 0.5);
+}
+
+.topup-alert {
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.topup-alert.error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fecaca;
+}
+
+.topup-alert.success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #bbf7d0;
+}
+
+.topup-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topup-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.topup-card.popular {
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25) inset;
+}
+
+.topup-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #1a1025;
+}
+
+.topup-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.topup-main strong {
+  font-size: 15px;
+}
+
+.topup-main span {
+  color: #f5d98e;
+  font-weight: 700;
+}
+
+.topup-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.7);
+}
+
+.topup-price {
+  font-weight: 800;
+  color: #f0ece4;
+}
+
+.topup-bonus {
+  color: #fbbf24;
+  font-size: 12px;
+}
+
+.topup-btn,
+.topup-dev-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.topup-btn {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: #ffffff;
+}
+
+.topup-dev-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.topup-btn:disabled,
+.topup-dev-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.topup-btn:not(:disabled):active,
+.topup-dev-btn:not(:disabled):active {
+  transform: scale(0.98);
+}
 /* ── 토스 광고 섹션 ── */
 .toss-ad-section {
   padding: 16px 20px;
