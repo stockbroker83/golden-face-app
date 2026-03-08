@@ -28,7 +28,7 @@ const FAQS = [
 ];
 
 const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "";
-const TOSS_CONFIRM_API_URL = import.meta.env.VITE_TOSS_CONFIRM_API_URL || "/api/toss/confirm";
+const TOSS_CONFIRM_API_URL = import.meta.env.VITE_TOSS_CONFIRM_API_URL || "";
 const TOSS_SCRIPT_URL = "https://js.tosspayments.com/v1/payment";
 
 declare global {
@@ -101,7 +101,7 @@ export default function Payment({ onPaymentSuccess, onBack }: Props) {
       setError(null);
 
       if (!TOSS_CONFIRM_API_URL && !import.meta.env.DEV) {
-        throw new Error("운영 환경에서는 결제 승인 API(VITE_TOSS_CONFIRM_API_URL) 설정이 필요합니다.");
+        throw new Error("운영 환경에서는 결제 승인 API(VITE_TOSS_CONFIRM_API_URL) 설정이 필요합니다. (정적 호스팅에서는 서버 엔드포인트를 별도 배포해야 합니다.)");
       }
 
       if (TOSS_CONFIRM_API_URL) {
