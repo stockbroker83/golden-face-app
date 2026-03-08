@@ -1,0 +1,381 @@
+/* ── PsychologyTest.css ── */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+
+.psych-page, .psych-result-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a12 0%, #0d1520 40%, #0d0b18 100%);
+  color: #f0ece4;
+  font-family: 'Noto Sans KR', sans-serif;
+  padding-bottom: 40px;
+}
+
+.psych-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.psych-header h1 { font-size: 18px; font-weight: 700; margin: 0; }
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  transition: width 0.4s ease;
+}
+
+.q-count {
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.4);
+  font-weight: 500;
+  min-width: 32px;
+  text-align: right;
+}
+
+/* ── 로딩 ── */
+.psych-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px;
+  text-align: center;
+}
+
+.brain-pulse {
+  font-size: 56px;
+  animation: brainPulse 1.5s ease infinite;
+  margin-bottom: 24px;
+}
+
+@keyframes brainPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-5deg); }
+  75% { transform: scale(1.1) rotate(5deg); }
+}
+
+.psych-loading h2 { font-size: 18px; margin: 0 0 8px; }
+.psych-loading p { font-size: 14px; color: rgba(240, 236, 228, 0.5); margin: 0 0 16px; }
+
+/* ── 질문 영역 ── */
+.question-area {
+  padding: 40px 20px;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.q-emoji {
+  display: block;
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.q-text {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  margin: 0 0 32px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f0ece4;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+  text-align: left;
+}
+
+.option-btn:hover {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.option-btn.selected {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.5);
+  color: #67e8f9;
+}
+
+.option-text { flex: 1; }
+
+.option-check {
+  opacity: 0;
+  color: #67e8f9;
+  font-weight: 700;
+  transition: opacity 0.3s;
+}
+
+.option-btn.selected .option-check { opacity: 1; }
+
+/* ── 결과 페이지 ── */
+.psych-hero {
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.result-big-emoji {
+  display: block;
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.result-type-name {
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 8px;
+  background: linear-gradient(135deg, #67e8f9, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.result-percentage {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: rgba(6, 182, 212, 0.15);
+  color: #67e8f9;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.result-desc {
+  font-size: 14px;
+  color: rgba(240, 236, 228, 0.6);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── 강점/약점 ── */
+.traits-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 20px;
+}
+
+.trait-card {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.trait-card.strengths { border-left: 3px solid #10b981; }
+.trait-card.weaknesses { border-left: 3px solid #f59e0b; }
+
+.trait-card h3 { font-size: 15px; margin: 0 0 12px; }
+
+.trait-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trait-card li {
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.6);
+  padding-left: 16px;
+  position: relative;
+}
+
+.trait-card li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  font-weight: 900;
+  color: rgba(240, 236, 228, 0.3);
+}
+
+/* ── 궁합 유형 & 조언 ── */
+.compatible-section, .psych-advice {
+  padding: 24px 20px 0;
+}
+
+.compatible-section h3, .psych-advice h3 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.compatible-section p, .psych-advice p {
+  font-size: 14px;
+  color: rgba(240, 236, 228, 0.6);
+  line-height: 1.6;
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== 품질 10배 향상 추가 스타일 ===== */
+
+/* 희귀 배지 */
+.rarity-badge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #0a0a12;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* 탭 메뉴 */
+.psych-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.psych-tabs button {
+  flex: 1;
+  padding: 12px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(240, 236, 228, 0.5);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.psych-tabs button.active {
+  background: rgba(6, 182, 212, 0.2);
+  color: #67e8f9;
+  font-weight: 700;
+}
+
+/* 특성 아이콘 */
+.trait-icon {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+/* 궁합 카드 */
+.compatible-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.compatible-card p {
+  background: transparent;
+  padding: 0;
+}
+
+/* 성장 가이드 섹션 */
+.growth-guide-section {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.advice-content {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.1);
+  border-left: 3px solid #8b5cf6;
+}
+
+.advice-content p {
+  padding: 0;
+  background: transparent;
+}
+
+/* 액션 플랜 */
+.action-plan h3,
+.recommended-activities h3 {
+  font-size: 15px;
+  margin: 0 0 12px;
+  color: #f0ece4;
+}
+
+.action-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.action-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.action-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: #f0ece4;
+}
+
+.action-card p {
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.6);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 추천 활동 */
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.activity-item {
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  font-size: 13px;
+  color: rgba(240, 236, 228, 0.7);
+  font-weight: 500;
+}

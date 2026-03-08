@@ -1,0 +1,294 @@
+/* ===== UserInfo 4단계 플로우 스타일 ===== */
+
+.user-info-flow {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a0a12 0%, #1a1330 100%);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 진행바 */
+.flow-progress {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 48px;
+}
+
+.progress-bar-wrapper {
+  width: 100%;
+  height: 6px;
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d4af37, #f5d98e);
+  border-radius: 10px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
+}
+
+.progress-text {
+  text-align: center;
+  color: #f5d98e;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Step 컨테이너 */
+.flow-step {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-icon {
+  font-size: 4em;
+  margin-bottom: 24px;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.step-title {
+  font-size: 1.8em;
+  font-weight: 800;
+  color: #f8f9fa;
+  margin: 0 0 12px;
+}
+
+.step-subtitle {
+  font-size: 1em;
+  color: #c4b5fd;
+  line-height: 1.6;
+  margin: 0 0 32px;
+}
+
+.highlight {
+  color: #f5d98e;
+  font-weight: 700;
+}
+
+/* 입력 필드 */
+.flow-input {
+  width: 100%;
+  background: rgba(18, 16, 31, 0.8);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 1.1em;
+  color: #f8f9fa;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  margin-bottom: 16px;
+}
+
+.flow-input:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+}
+
+.flow-input::placeholder {
+  color: rgba(209, 213, 219, 0.5);
+}
+
+/* 날짜 입력 */
+.date-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.date-input {
+  width: 80px;
+  text-align: center;
+  margin: 0;
+}
+
+.date-separator {
+  color: #d1d5db;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.lunar-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #c4b5fd;
+  font-size: 0.95em;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.lunar-checkbox input {
+  cursor: pointer;
+}
+
+/* 성별 버튼 */
+.gender-buttons {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.gender-btn {
+  flex: 1;
+  background: rgba(18, 16, 31, 0.8);
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.gender-btn:hover {
+  transform: translateY(-4px);
+  border-color: #d4af37;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+}
+
+.gender-btn.selected {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(245, 217, 142, 0.2));
+  border-color: #f5d98e;
+  box-shadow: 0 8px 32px rgba(212, 175, 55, 0.5);
+}
+
+.gender-icon {
+  font-size: 3em;
+}
+
+.gender-text {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: #f8f9fa;
+}
+
+/* 힌트 */
+.input-hint {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #c4b5fd;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+/* 액션 버튼 */
+.flow-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 32px;
+}
+
+.btn-secondary {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8f9fa;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-primary {
+  flex: 2;
+  background: linear-gradient(135deg, #d4af37, #f5d98e);
+  border: none;
+  color: #0a0a12;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.1em;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.6);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 배경 파티클 */
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #f5d98e;
+  border-radius: 50%;
+  animation: float linear infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh) scale(1);
+    opacity: 0;
+  }
+}

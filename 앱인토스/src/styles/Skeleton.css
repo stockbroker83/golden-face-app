@@ -1,0 +1,69 @@
+.analyzing-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.spinner {
+  font-size: 60px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.skeleton-list {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feature-skeleton {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-title {
+  width: 40%;
+  height: 20px;
+  margin-bottom: 10px;
+}
+
+.skeleton-score {
+  width: 60px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+.skeleton-bar {
+  width: 100%;
+  height: 10px;
+  margin-bottom: 15px;
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.skeleton-text:last-child {
+  width: 80%;
+}

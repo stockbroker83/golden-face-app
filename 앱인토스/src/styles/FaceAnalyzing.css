@@ -1,0 +1,87 @@
+.face-analyzing-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.analyzing-content {
+  text-align: center;
+  color: white;
+  width: 100%;
+  max-width: 520px;
+}
+
+.magic-circle {
+  width: 140px;
+  height: 140px;
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  animation: spin 1.5s linear infinite;
+}
+
+.analyzing-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.analyzing-subtitle {
+  margin-top: 8px;
+  opacity: 0.9;
+}
+
+.progress-messages {
+  margin: 28px 0;
+}
+
+.message {
+  font-size: 16px;
+  margin: 10px 0;
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+.message.active {
+  opacity: 1;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 10px;
+  animation: fillProgress 5s linear forwards;
+}
+
+.wait-text {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.error-text {
+  margin-top: 16px;
+  color: #ffd1d1;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fillProgress {
+  from { width: 0; }
+  to { width: 100%; }
+}

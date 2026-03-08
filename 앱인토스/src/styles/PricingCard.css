@@ -1,0 +1,79 @@
+.pricing-card {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 14px;
+}
+
+.pricing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.discount-badge {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+}
+
+.price-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.original-price {
+  color: #d1d5db;
+  text-decoration: line-through;
+  font-size: 14px;
+}
+
+.sale-price {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  -webkit-text-stroke: 1px rgba(124, 45, 18, 0.55);
+  text-shadow:
+    0 2px 0 rgba(124, 45, 18, 0.45),
+    0 8px 20px rgba(239, 68, 68, 0.45),
+    0 0 16px rgba(249, 115, 22, 0.5);
+  background: linear-gradient(180deg, #fff7ed 0%, #fde68a 45%, #fb923c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pricing-signals {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.pricing-signals strong {
+  color: #fde68a;
+}
+
+.countdown-box {
+  margin-top: 12px;
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.55);
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+.countdown-box strong {
+  color: #fef08a;
+  font-size: 16px;
+}
