@@ -2,7 +2,6 @@ import { useState } from "react";
 import { IAP } from "@apps-in-toss/web-framework";
 import { PointsData } from "../types";
 import { addPoints, savePoints } from "../utils/pointsManager";
-import TossAdRewardButton from "../components/TossAdRewardButton";
 import "../styles/PointsPage.css";
 
 interface Props {
@@ -10,13 +9,6 @@ interface Props {
   onBack: () => void;
   onUpdatePoints: (points: PointsData) => void;
 }
-
-const REWARDS = [
-  { name: "프리미엄 1회 무료", cost: 500, emoji: "👑", available: true },
-  { name: "궁합 분석 추가 1회", cost: 200, emoji: "💕", available: true },
-  { name: "행운 부적 이미지", cost: 100, emoji: "🧧", available: true },
-  { name: "오늘의 특별 운세", cost: 50, emoji: "⭐", available: true },
-];
 
 const POINT_PACKAGES = [
   { sku: "points_starter_100", name: "입문팩", points: 100, price: 1000, bonus: 0 },
@@ -42,12 +34,6 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
   const [isPurchasing, setIsPurchasing] = useState<string | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
-
-  const handleTossAdReward = (rewardPoints: number) => {
-    const updated = addPoints(points, rewardPoints, "광고 시청", "📺");
-    savePoints(updated);
-    onUpdatePoints(updated);
-  };
 
   const grantPointsFromPurchase = (pkg: PointPackage, orderId: string) => {
     const updated = addPoints(points, pkg.points, `${pkg.name} 충전`, "💳");
@@ -108,7 +94,6 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
         <h1>🏮 복주머니</h1>
       </header>
 
-      {/* 메인 현황 */}
       <section className="points-hero">
         <div className="points-lantern">🏮</div>
         <div className="points-number">{points.total_points}</div>
@@ -127,14 +112,6 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
         </div>
       </section>
 
-      {/* 토스 광고 보상 섹션 */}
-      <section className="toss-ad-section">
-        <div className="ad-container">
-          <TossAdRewardButton onReward={handleTossAdReward} />
-        </div>
-      </section>
-
-      {/* 복주머니 충전 */}
       <section className="topup-section">
         <h2>충전하기</h2>
         <p className="topup-desc">결제로 복주머니를 즉시 충전할 수 있어요.</p>
@@ -177,9 +154,8 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
         </div>
       </section>
 
-      {/* 복주머니 적립 방법 */}
       <section className="earn-section">
-        <h2>적립 방법</h2>
+        <h2>🎁 무료 획득</h2>
         <div className="earn-list">
           <div className="earn-item">
             <span className="earn-emoji">📅</span>
@@ -189,72 +165,56 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
             </div>
             <span className="earn-amount">+5</span>
           </div>
-          <div className="earn-item">
-            <span className="earn-emoji">👁️</span>
-            <div className="earn-info">
-              <strong>관상 분석</strong>
-              <span>AI 관상 분석 완료 시</span>
-            </div>
-            <span className="earn-amount">+10</span>
-          </div>
-          <div className="earn-item">
+        </div>
+      </section>
+
+      <section className="earn-section">
+        <h2>💸 사용 비용</h2>
+        <div className="earn-list">
+          <div className="earn-item cost-item">
             <span className="earn-emoji">🔮</span>
             <div className="earn-info">
               <strong>오늘의 관상</strong>
-              <span>데일리 운세 확인 시</span>
+              <span>데일리 운세 (1회)</span>
             </div>
-            <span className="earn-amount">+10</span>
+            <span className="earn-amount cost">-30</span>
           </div>
-          <div className="earn-item">
+          <div className="earn-item cost-item">
+            <span className="earn-emoji">👁️</span>
+            <div className="earn-info">
+              <strong>AI 관상 12부위</strong>
+              <span>프리미엄 분석 (1회)</span>
+            </div>
+            <span className="earn-amount cost">-30</span>
+          </div>
+          <div className="earn-item cost-item">
             <span className="earn-emoji">💕</span>
             <div className="earn-info">
               <strong>궁합 분석</strong>
-              <span>궁합 분석 완료 시</span>
+              <span>상대와의 궁합</span>
             </div>
-            <span className="earn-amount">+15</span>
+            <span className="earn-amount cost">-15</span>
           </div>
-          <div className="earn-item">
+          <div className="earn-item cost-item">
             <span className="earn-emoji">🧠</span>
             <div className="earn-info">
               <strong>심리테스트</strong>
-              <span>테스트 완료 시</span>
+              <span>성격 분석 테스트</span>
             </div>
-            <span className="earn-amount">+20</span>
+            <span className="earn-amount cost">-15</span>
           </div>
-          <div className="earn-item">
-            <span className="earn-emoji">📤</span>
+          <div className="earn-item cost-item">
+            <span className="earn-emoji">🙏</span>
             <div className="earn-info">
-              <strong>결과 공유</strong>
-              <span>친구에게 결과 공유 시</span>
+              <strong>소원의 담벼락</strong>
+              <span>소원 등록 1회</span>
             </div>
-            <span className="earn-amount">+5</span>
+            <span className="earn-amount cost">-1</span>
           </div>
         </div>
+        <p className="cost-note">💡 프리미엄 구매 시 모든 기능 무제한 이용</p>
       </section>
 
-      {/* 교환 상품 */}
-      <section className="rewards-section">
-        <h2>교환하기</h2>
-        <div className="rewards-list">
-          {REWARDS.map((reward, idx) => (
-            <div key={idx} className="reward-card">
-              <span className="reward-emoji">{reward.emoji}</span>
-              <div className="reward-info">
-                <strong>{reward.name}</strong>
-                <span className="reward-cost">🏮 {reward.cost}</span>
-              </div>
-              <button
-                className={`reward-btn ${points.total_points >= reward.cost ? "" : "disabled"}`}
-                disabled={points.total_points < reward.cost}
-              >
-                교환
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 최근 내역 */}
       {points.history.length > 0 && (
         <section className="history-section">
           <h2>최근 내역</h2>

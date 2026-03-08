@@ -85,23 +85,23 @@
 }
 
 /* ── 적립 방법 ── */
-.earn-section, .rewards-section, .history-section {
+.earn-section, .history-section {
   padding: 24px 20px 0;
 }
 
-.earn-section h2, .rewards-section h2, .history-section h2 {
+.earn-section h2, .history-section h2 {
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 16px;
 }
 
-.earn-list, .rewards-list, .history-list {
+.earn-list, .history-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.earn-item, .reward-card, .history-item {
+.earn-item, .history-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -111,20 +111,20 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.earn-emoji, .reward-emoji, .history-emoji { font-size: 24px; min-width: 28px; text-align: center; }
+.earn-emoji, .history-emoji { font-size: 24px; min-width: 28px; text-align: center; }
 
-.earn-info, .reward-info, .history-info {
+.earn-info, .history-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.earn-info strong, .reward-info strong, .history-info strong {
+.earn-info strong, .history-info strong {
   font-size: 14px;
 }
 
-.earn-info span, .reward-info span, .history-info span {
+.earn-info span, .history-info span {
   font-size: 12px;
   color: rgba(240, 236, 228, 0.4);
 }
@@ -135,28 +135,24 @@
   color: #f5d98e;
 }
 
-.reward-cost {
-  color: #d4af37 !important;
-  font-weight: 500;
+.earn-amount.cost {
+  color: #f87171;
 }
 
-.reward-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #d4af37, #f5d98e);
-  color: #1a1025;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
+.cost-item {
+  background: rgba(248, 113, 113, 0.05);
+  border-color: rgba(248, 113, 113, 0.1);
 }
 
-.reward-btn.disabled {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(240, 236, 228, 0.3);
-  cursor: not-allowed;
+.cost-note {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-size: 12px;
+  color: #c4b5fd;
+  text-align: center;
 }
 
 .history-points {

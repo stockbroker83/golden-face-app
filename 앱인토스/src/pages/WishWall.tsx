@@ -3,7 +3,7 @@ import "../styles/ExtraFeatures.css";
 
 interface Props {
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
+  onSpendPoints: (amount: number, action: string, emoji: string) => boolean;
 }
 
 interface Wish {
@@ -27,7 +27,7 @@ const SAMPLE_WISHES: Wish[] = [
 
 const WISH_EMOJIS = ["⭐", "💕", "💰", "💚", "📖", "🌸", "✨", "🕊️", "🙏", "🍀"];
 
-export default function WishWall({ onBack, onEarnPoints }: Props) {
+export default function WishWall({ onBack, onSpendPoints }: Props) {
   const [wishes, setWishes] = useState<Wish[]>([]);
   const [newWish, setNewWish] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState("⭐");
@@ -47,6 +47,12 @@ export default function WishWall({ onBack, onEarnPoints }: Props) {
   const handleSubmit = () => {
     if (!newWish.trim()) return;
 
+    const spent = onSpendPoints(1, "소원 등록", "🙏");
+    if (!spent) {
+      alert("복주머니가 부족해요. 소원 등록에는 1개가 필요합니다.");
+      return;
+    }
+
     const wish: Wish = {
       id: `my_${Date.now()}`,
       text: newWish.trim(),
@@ -65,7 +71,6 @@ export default function WishWall({ onBack, onEarnPoints }: Props) {
 
     setNewWish("");
     setShowInput(false);
-    onEarnPoints(10, "소원 등록", "🙏");
   };
 
   const handleLike = (id: string) => {
@@ -95,7 +100,7 @@ export default function WishWall({ onBack, onEarnPoints }: Props) {
 
       {!showInput ? (
         <button className="wish-write-btn" onClick={() => setShowInput(true)}>
-          ✍️ 소원 적기 <span className="action-points-inline">+10 🏮</span>
+          ✍️ 소원 적기 <span className="action-points-inline">-1 🏮</span>
         </button>
       ) : (
         <div className="wish-input-area">

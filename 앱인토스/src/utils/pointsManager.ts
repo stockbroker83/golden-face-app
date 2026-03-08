@@ -91,17 +91,6 @@ export const POINTS_METHODS = {
   referral: { points: 50, label: '친구 초대', emoji: '👥' },
 };
 
-// ==========================================
-// Points Exchange Shop
-// ==========================================
-export const POINTS_SHOP = [
-  { id: 'premium_trial', name: '프리미엄 무료 체험', points: 500, emoji: '👑' },
-  { id: 'compatibility_extra', name: '궁합 분석 추가권', points: 200, emoji: '❤️' },
-  { id: 'special_amulet', name: '특별 부적', points: 100, emoji: '🧿' },
-  { id: 'premium_fortune', name: '특급 운세', points: 50, emoji: '⭐' },
-  { id: 'custom_analysis', name: '맞춤 분석', points: 300, emoji: '🔮' },
-];
-
 export interface StreakReward {
   bonusPoints: number;
   rewardLabel: string;
@@ -211,60 +200,6 @@ export function deductPoints(
 }
 
 // ==========================================
-// Points Exchange
-// ==========================================
-export interface ExchangeResult {
-  success: boolean;
-  message: string;
-  updatedPoints?: PointsData;
-  itemId?: string;
-}
-
-export function exchangePoints(
-  current: PointsData,
-  itemId: string
-): ExchangeResult {
-  const item = POINTS_SHOP.find(i => i.id === itemId);
-  
-  if (!item) {
-    return {
-      success: false,
-      message: '존재하지 않는 상품입니다.',
-    };
-  }
-
-  const updated = deductPoints(current, item.points, `${item.name} 교환`, item.emoji);
-  
-  if (!updated) {
-    return {
-      success: false,
-      message: `포인트가 부족합니다. (필요: ${item.points}P, 보유: ${current.total_points}P)`,
-    };
-  }
-
-  // Handle special items
-  if (itemId === 'premium_trial') {
-    localStorage.setItem(
-      "golden_face_vip",
-      JSON.stringify({
-        user_id: `points_exchange_${Date.now()}`,
-        is_vip: true,
-        purchased_at: new Date().toISOString(),
-        order_id: `POINTS_EXCHANGE_${itemId.toUpperCase()}`,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
-      })
-    );
-  }
-
-  return {
-    success: true,
-    message: `${item.name}을(를) 교환했습니다!`,
-    updatedPoints: updated,
-    itemId,
-  };
-}
-
-// ==========================================
 // Get Next Streak Reward Info
 // ==========================================
 export function getNextStreakReward(currentStreak: number) {
@@ -313,12 +248,12 @@ export function getDefaultPointsData(): PointsData {
 // Daily Usage Limits & Checks
 // ==========================================
 export const USAGE_LIMITS = {
-  daily_fortune: { cost: 50, limit: 5 },
-  compatibility: { cost: 100, limit: 3 },
-  psych_test: { cost: 50, limit: 5 },
+  daily_fortune: { cost: 30, limit: 5 },
+  compatibility: { cost: 15, limit: 3 },
+  psych_test: { cost: 15, limit: 5 },
   saju: { cost: 100, limit: 2 },
   tarot_chat: { cost: 50, limit: 10 },
-  face_reading_12: { cost: 200, limit: 1 },
+  face_reading_12: { cost: 30, limit: 1 },
 };
 
 export type UsageType = keyof typeof USAGE_LIMITS;

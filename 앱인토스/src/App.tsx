@@ -33,7 +33,7 @@ import {
   PsychTestResult,
 } from "./types";
 import { analyzeFacePremium } from "./services/gemini";
-import { loadPoints, savePoints, addPoints, addStreak } from "./utils/pointsManager";
+import { loadPoints, savePoints, addPoints, addStreak, deductPoints } from "./utils/pointsManager";
 import { requestNotificationPermission } from "./utils/notificationManager";
 import "./App.css";
 
@@ -140,6 +140,16 @@ function App() {
     const updated = addPoints(appState.points, amount, action, emoji);
     savePoints(updated);
     setAppState((prev) => ({ ...prev, points: updated }));
+  };
+
+  const spendPoints = (amount: number, action: string, emoji: string): boolean => {
+    const updated = deductPoints(appState.points, amount, action, emoji);
+    if (!updated) {
+      return false;
+    }
+    savePoints(updated);
+    setAppState((prev) => ({ ...prev, points: updated }));
+    return true;
   };
 
   const handleClaimDaily = () => {
@@ -370,7 +380,7 @@ function App() {
       {appState.current_step === "wish_wall" && (
         <WishWall
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
+          onSpendPoints={spendPoints}
         />
       )}
 
