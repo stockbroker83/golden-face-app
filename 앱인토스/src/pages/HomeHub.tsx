@@ -248,19 +248,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
         </div>
       </section>
 
-      {/* ── 프리미엄 배너 ── */}
-      {!isPaid && (
-        <section className="hub-premium-banner" onClick={() => onNavigate("upload")}>
-          <div className="premium-banner-bg" />
-          <div className="premium-banner-content">
-            <div className="premium-badge">PREMIUM</div>
-            <h3>관상 · 사주 · 타로 · 주역</h3>
-            <p>종합 운명 리포트를 한 번에 확인하세요</p>
-            <span className="premium-price">₩25,000 → 오늘만 ₩18,900</span>
-          </div>
-        </section>
-      )}
-
       {/* ── 복주머니 현황 ── */}
       <section className="hub-points-section" onClick={() => onNavigate("points")}>
         <div className="points-summary">
@@ -277,6 +264,19 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
         </div>
       </section>
+
+      {/* ── 하단 결제 광고 ── */}
+      {!isPaid && (
+        <section className="hub-premium-banner" onClick={() => onNavigate("upload")}>
+          <div className="premium-banner-bg" />
+          <div className="premium-banner-content">
+            <div className="premium-badge">PREMIUM</div>
+            <h3>관상 · 사주 · 타로 · 주역</h3>
+            <p>종합 운명 리포트를 한 번에 확인하세요</p>
+            <span className="premium-price">₩19,900 → 오늘만 ₩9,900</span>
+          </div>
+        </section>
+      )}
 
       {/* ── 하단 안내 ── */}
       <footer className="hub-footer">
