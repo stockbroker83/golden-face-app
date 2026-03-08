@@ -34,6 +34,7 @@ import {
 } from "./types";
 import { analyzeFacePremium } from "./services/gemini";
 import { loadPoints, savePoints, addPoints, addStreak, deductPoints } from "./utils/pointsManager";
+import { fetchServerAccountState, isVipActive, loadLocalVip } from "./services/accountState";
 import { requestNotificationPermission } from "./utils/notificationManager";
 import "./App.css";
 
@@ -71,14 +72,19 @@ function App() {
   useEffect(() => {
     const savedUser = localStorage.getItem("golden_face_user");
     const savedPoints = loadPoints();
-    const savedVip = localStorage.getItem("golden_face_vip");
+    const localVip = loadLocalVip();
+    const localIsPaid = isVipActive(localVip);
 
-    let isPaid = false;
-    if (savedVip) {
-      try {
-        isPaid = Boolean(JSON.parse(savedVip)?.is_vip);
-      } catch {}
-    }
+    const hydrateFromServer = async () => {
+      const serverState = await fetchServerAccountState();
+      if (!serverState) return;
+
+      setAppState((prev) => ({
+        ...prev,
+        points: serverState.points || prev.points,
+        is_paid: isVipActive(serverState.vip || null) || Boolean(serverState.is_vip),
+      }));
+    };
 
     if (savedUser) {
       try {
@@ -87,9 +93,11 @@ function App() {
           ...prev,
           user_data: userData,
           points: savedPoints || DEFAULT_POINTS,
-          is_paid: isPaid,
+          is_paid: localIsPaid,
           current_step: "hub", // 기존 유저는 바로 허브로
         }));
+
+        void hydrateFromServer();
       } catch {}
     }
   }, []);

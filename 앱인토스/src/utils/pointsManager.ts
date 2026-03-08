@@ -1,4 +1,5 @@
 import { PointsData, PointHistory } from "../types";
+import { grantVipOnServer, saveLocalVip, syncPointsToServer } from "../services/accountState";
 
 const STORAGE_KEY = "golden_face_points";
 
@@ -14,6 +15,7 @@ export function loadPoints(): PointsData | null {
 
 export function savePoints(data: PointsData): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  void syncPointsToServer(data);
 }
 
 export function addPoints(
@@ -129,16 +131,15 @@ export function addStreak(current: PointsData) {
     // Special handling for 30-day streak
     if (milestone.day === 30) {
       unlockedPremium = true;
-      localStorage.setItem(
-        "golden_face_vip",
-        JSON.stringify({
-          user_id: `streak_${Date.now()}`,
-          is_vip: true,
-          purchased_at: new Date().toISOString(),
-          order_id: "STREAK_30_REWARD",
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        })
-      );
+      const vipReward = {
+        user_id: `streak_${Date.now()}`,
+        is_vip: true,
+        purchased_at: new Date().toISOString(),
+        order_id: "STREAK_30_REWARD",
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+      saveLocalVip(vipReward);
+      void grantVipOnServer(vipReward);
     }
   }
 

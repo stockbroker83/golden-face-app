@@ -2,6 +2,7 @@
 import { IAP } from "@apps-in-toss/web-framework";
 import PricingCard from "../components/PricingCard";
 import { vibrateLight, vibrateSuccess, vibrateError } from "../utils/haptic";
+import { grantVipOnServer, saveLocalVip } from "../services/accountState";
 import "../styles/Payment.css";
 
 interface Props {
@@ -78,15 +79,15 @@ export default function Payment({ onPaymentSuccess, onBack }: Props) {
   }, []);
 
   const grantVip = (orderId: string) => {
-    localStorage.setItem(
-      "golden_face_vip",
-      JSON.stringify({
-        user_id: String(Date.now()),
-        is_vip: true,
-        purchased_at: new Date().toISOString(),
-        order_id: orderId,
-      })
-    );
+    const vip = {
+      user_id: String(Date.now()),
+      is_vip: true,
+      purchased_at: new Date().toISOString(),
+      order_id: orderId,
+    };
+
+    saveLocalVip(vip);
+    void grantVipOnServer(vip);
   };
 
   const proceedWithTestBypass = () => {

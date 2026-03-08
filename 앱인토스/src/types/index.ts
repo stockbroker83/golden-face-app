@@ -74,6 +74,7 @@ export interface VIPMembership {
   is_vip: boolean;
   purchased_at: string;
   order_id?: string;
+  expires_at?: string;
 }
 
 export interface FaceData {
