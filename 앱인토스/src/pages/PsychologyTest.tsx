@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { UserData, PsychTestResult, PsychTestQuestion } from "../types";
+import { UserData, PsychTestResult, PsychTestQuestion, PointsData } from "../types";
 import { analyzePsychTest } from "../services/gemini";
+import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
 import "../styles/PsychologyTest.css";
 
 interface Props {
   userData: UserData;
+  points: PointsData;
+  isPaid: boolean;
   onResult: (result: PsychTestResult) => void;
   onBack: () => void;
+  onUpdatePoints: (points: PointsData) => void;
 }
 
 const QUESTIONS: PsychTestQuestion[] = [
@@ -89,15 +93,35 @@ const QUESTIONS: PsychTestQuestion[] = [
   },
 ];
 
-export default function PsychologyTest({ userData, onResult, onBack }: Props) {
+export default function PsychologyTest({ userData, points, isPaid, onResult, onBack, onUpdatePoints }: Props) {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const progress = ((currentQ) / QUESTIONS.length) * 100;
+  const remainingUses = getRemainingUses(points, "psych_test");
+  const costInfo = { cost: 50, remaining: remainingUses };
 
   const handleSelect = async (value: string, optionIdx: number) => {
+    if (currentQ === 0 && answers.length === 0 && !isPaid) {
+      const check = canUseFeature(points, "psych_test", false);
+      if (!check.allowed) {
+        setError(check.reason || "심리테스트를 시작할 수 없습니다.");
+        return;
+      }
+
+      const updatedPoints = useFeature(points, "psych_test", false);
+      if (!updatedPoints) {
+        setError("포인트 차감에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+
+      savePoints(updatedPoints);
+      onUpdatePoints(updatedPoints);
+    }
+
     setSelectedOption(optionIdx);
 
     setTimeout(async () => {
@@ -137,6 +161,45 @@ export default function PsychologyTest({ userData, onResult, onBack }: Props) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="psych-page">
+        <div className="psych-loading" style={{ gap: "1rem" }}>
+          <div className="brain-pulse">⚠️</div>
+          <h2>심리테스트를 시작할 수 없어요</h2>
+          <p>{error}</p>
+          {!isPaid && (
+            <div style={{
+              background: "rgba(102,126,234,0.12)",
+              border: "1px solid rgba(102,126,234,0.35)",
+              borderRadius: "12px",
+              padding: "12px 14px",
+              width: "100%",
+              maxWidth: "340px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.4rem"
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
+                <span>필요 복주머니</span>
+                <strong>🏮 {costInfo.cost}개</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
+                <span>보유 복주머니</span>
+                <strong>🏮 {points.total_points}개</strong>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
+                <span>오늘 남은 횟수</span>
+                <strong>{costInfo.remaining}/5회</strong>
+              </div>
+            </div>
+          )}
+          <button className="back-btn" onClick={onBack}>← 뒤로</button>
+        </div>
+      </div>
+    );
+  }
+
   const q = QUESTIONS[currentQ];
 
   return (
@@ -148,6 +211,23 @@ export default function PsychologyTest({ userData, onResult, onBack }: Props) {
         </div>
         <span className="q-count">{currentQ + 1}/{QUESTIONS.length}</span>
       </header>
+
+      {!isPaid && (
+        <div style={{
+          margin: "0 1.2rem 1rem",
+          background: "rgba(102,126,234,0.08)",
+          border: "1px solid rgba(102,126,234,0.25)",
+          borderRadius: "12px",
+          padding: "0.65rem 0.8rem",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "0.82rem",
+          color: "rgba(240,236,228,0.9)"
+        }}>
+          <span>이용비용: 🏮 50개</span>
+          <span>오늘 남은 횟수: {costInfo.remaining}/5회</span>
+        </div>
+      )}
 
       <div className="question-area" key={currentQ}>
         <span className="q-emoji">{q.emoji}</span>

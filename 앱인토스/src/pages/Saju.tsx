@@ -1,15 +1,21 @@
 import { useState } from "react";
+import { PointsData } from "../types";
 import { analyzeSaju, type SajuAnalysis, type WuXing } from "../utils/sajuCalculator";
 import { analyzeSajuWithAI, type SajuAIResult } from "../services/gemini";
+import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
 import "../styles/ExtraFeatures.css";
 
 interface SajuProps {
   onBack: () => void;
+  points: PointsData;
+  isPaid: boolean;
+  onUpdatePoints: (points: PointsData) => void;
 }
 
-export default function Saju({ onBack }: SajuProps) {
+export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuProps) {
   const [step, setStep] = useState<'input' | 'result'>('input');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [gender, setGender] = useState<'male' | 'female'>('male');
@@ -20,8 +26,11 @@ export default function Saju({ onBack }: SajuProps) {
 
   const [sajuAnalysis, setSajuAnalysis] = useState<SajuAnalysis | null>(null);
   const [aiResult, setAiResult] = useState<SajuAIResult | null>(null);
+  const remainingUses = getRemainingUses(points, "saju");
 
   const handleAnalyze = async () => {
+    setError(null);
+
     if (!name || !year || !month || !day) {
       alert("모든 정보를 입력해주세요.");
       return;
@@ -35,6 +44,23 @@ export default function Saju({ onBack }: SajuProps) {
     if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1 || d > 31) {
       alert("올바른 날짜를 입력해주세요.");
       return;
+    }
+
+    if (!isPaid) {
+      const check = canUseFeature(points, "saju", false);
+      if (!check.allowed) {
+        setError(check.reason || "사주 분석을 시작할 수 없습니다.");
+        return;
+      }
+
+      const updatedPoints = useFeature(points, "saju", false);
+      if (!updatedPoints) {
+        setError("포인트 차감에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+
+      savePoints(updatedPoints);
+      onUpdatePoints(updatedPoints);
     }
 
     setLoading(true);
@@ -287,6 +313,36 @@ export default function Saju({ onBack }: SajuProps) {
       <div className="extra-content">
         <div className="result-card">
           <h3>생년월일시 입력</h3>
+
+          {!isPaid && (
+            <div style={{
+              marginTop: '1rem',
+              background: 'rgba(99, 102, 241, 0.12)',
+              border: '1px solid rgba(99, 102, 241, 0.35)',
+              borderRadius: '12px',
+              padding: '0.75rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: '0.85rem'
+            }}>
+              <span>이용비용: 🏮 100개</span>
+              <span>오늘 남은 횟수: {remainingUses}/2회</span>
+            </div>
+          )}
+
+          {error && (
+            <div style={{
+              marginTop: '0.75rem',
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: '10px',
+              padding: '0.75rem',
+              fontSize: '0.85rem',
+              color: '#fecaca'
+            }}>
+              ⚠️ {error}
+            </div>
+          )}
           
           <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div>

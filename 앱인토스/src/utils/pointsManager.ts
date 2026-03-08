@@ -302,6 +302,9 @@ export function getDefaultPointsData(): PointsData {
       daily_fortune: 0,
       compatibility: 0,
       psych_test: 0,
+      saju: 0,
+      tarot_chat: 0,
+      face_reading_12: 0,
     },
   };
 }
@@ -313,6 +316,9 @@ export const USAGE_LIMITS = {
   daily_fortune: { cost: 50, limit: 5 },
   compatibility: { cost: 100, limit: 3 },
   psych_test: { cost: 50, limit: 5 },
+  saju: { cost: 100, limit: 2 },
+  tarot_chat: { cost: 50, limit: 10 },
+  face_reading_12: { cost: 200, limit: 1 },
 };
 
 export type UsageType = keyof typeof USAGE_LIMITS;
@@ -398,6 +404,9 @@ export function useFeature(
       daily_fortune: isNewDay ? 0 : usage!.daily_fortune,
       compatibility: isNewDay ? 0 : usage!.compatibility,
       psych_test: isNewDay ? 0 : usage!.psych_test,
+      saju: isNewDay ? 0 : usage!.saju,
+      tarot_chat: isNewDay ? 0 : usage!.tarot_chat,
+      face_reading_12: isNewDay ? 0 : usage!.face_reading_12,
       [featureType]: (isNewDay ? 0 : usage![featureType]) + 1,
     },
   };
@@ -411,6 +420,9 @@ function getFeatureName(featureType: UsageType): string {
     daily_fortune: "오늘의 관상",
     compatibility: "궁합 분석",
     psych_test: "심리테스트",
+    saju: "사주 분석",
+    tarot_chat: "타로 채팅",
+    face_reading_12: "12관상 분석",
   };
   return names[featureType];
 }

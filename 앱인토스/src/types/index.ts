@@ -186,6 +186,9 @@ export interface DailyUsage {
   daily_fortune: number;
   compatibility: number;
   psych_test: number;
+  saju: number;
+  tarot_chat: number;
+  face_reading_12: number;
 }
 
 export interface StreakData {

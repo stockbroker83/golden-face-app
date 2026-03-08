@@ -43,6 +43,15 @@ const DEFAULT_POINTS: PointsData = {
   streak_days: 0,
   last_daily_claim: "",
   history: [],
+  daily_usage: {
+    date: "",
+    daily_fortune: 0,
+    compatibility: 0,
+    psych_test: 0,
+    saju: 0,
+    tarot_chat: 0,
+    face_reading_12: 0,
+  },
 };
 
 function App() {
@@ -307,8 +316,16 @@ function App() {
       {appState.current_step === "psychtest" && appState.user_data && (
         <PsychologyTest
           userData={appState.user_data}
+          points={appState.points}
+          isPaid={appState.is_paid}
           onResult={handlePsychResult}
           onBack={() => goToStep("hub")}
+          onUpdatePoints={(updatedPoints: PointsData) => {
+            setAppState((prev) => ({
+              ...prev,
+              points: updatedPoints,
+            }));
+          }}
         />
       )}
 
@@ -383,6 +400,14 @@ function App() {
       {appState.current_step === "saju" && (
         <Saju
           onBack={() => goToStep("hub")}
+          points={appState.points}
+          isPaid={appState.is_paid}
+          onUpdatePoints={(updatedPoints: PointsData) => {
+            setAppState((prev) => ({
+              ...prev,
+              points: updatedPoints,
+            }));
+          }}
         />
       )}
 
