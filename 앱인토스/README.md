@@ -48,6 +48,15 @@ GitHub Pages에서는 `api/toss/confirm.js` 같은 서버 라우트가 실행되
 
 프론트 환경변수 `VITE_TOSS_CONFIRM_API_URL`에는 위 백엔드의 실제 URL을 설정해야 합니다.
 
+### GitHub Pages 배포 시 필수 설정
+
+GitHub 저장소 `Settings > Secrets and variables > Actions`에 아래 시크릿을 추가하세요.
+
+- `VITE_TOSS_CLIENT_KEY` = 토스 클라이언트 키
+- `VITE_TOSS_CONFIRM_API_URL` = 배포한 승인 API URL
+
+이 시크릿이 없으면 배포 워크플로우가 실패하도록 설정되어 있습니다.
+
 주의: `TOSS_SECRET_KEY`는 절대 `VITE_` 접두사로 프론트에 노출하면 안 됩니다.
 
 ## 개발 서버 실행
