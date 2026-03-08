@@ -258,6 +258,10 @@ export const USAGE_LIMITS = {
 
 export type UsageType = keyof typeof USAGE_LIMITS;
 
+export function getFeatureCost(featureType: UsageType): number {
+  return USAGE_LIMITS[featureType].cost;
+}
+
 /**
  * 일일 사용 가능 여부 확인
  */

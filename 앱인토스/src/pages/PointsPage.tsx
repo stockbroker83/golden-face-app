@@ -30,18 +30,23 @@ function getUnitPrice(points: number, price: number): string {
   return `개당 ₩${(price / points).toFixed(1)}`;
 }
 
+function getTotalPoints(pkg: PointPackage): number {
+  return pkg.points + pkg.bonus;
+}
+
 export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
   const [isPurchasing, setIsPurchasing] = useState<string | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
 
   const grantPointsFromPurchase = (pkg: PointPackage, orderId: string) => {
-    const updated = addPoints(points, pkg.points, `${pkg.name} 충전`, "💳");
+    const totalPoints = getTotalPoints(pkg);
+    const updated = addPoints(points, totalPoints, `${pkg.name} 충전`, "💳");
     savePoints(updated);
     onUpdatePoints(updated);
     localStorage.setItem(
       "golden_face_last_points_purchase",
-      JSON.stringify({ orderId, sku: pkg.sku, points: pkg.points, purchasedAt: new Date().toISOString() })
+      JSON.stringify({ orderId, sku: pkg.sku, points: totalPoints, purchasedAt: new Date().toISOString() })
     );
   };
 
@@ -60,7 +65,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
           },
         },
         onEvent: () => {
-          setPurchaseSuccess(`${pkg.name} 충전 완료! (+${pkg.points} 복주머니)`);
+          setPurchaseSuccess(`${pkg.name} 충전 완료! (+${getTotalPoints(pkg)} 복주머니)`);
           setIsPurchasing(null);
           cleanup?.();
         },
@@ -84,7 +89,7 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
   const handleDevTopup = (pkg: PointPackage) => {
     const orderId = `DEV_POINTS_${Date.now()}`;
     grantPointsFromPurchase(pkg, orderId);
-    setPurchaseSuccess(`테스트 충전 완료! (+${pkg.points} 복주머니)`);
+    setPurchaseSuccess(`테스트 충전 완료! (+${getTotalPoints(pkg)} 복주머니)`);
   };
 
   return (
@@ -125,13 +130,13 @@ export default function PointsPage({ points, onBack, onUpdatePoints }: Props) {
               {pkg.popular && <span className="topup-badge">인기</span>}
               <div className="topup-main">
                 <strong>{pkg.name}</strong>
-                <span>🏮 {pkg.points}개</span>
+                <span>🏮 {getTotalPoints(pkg)}개</span>
               </div>
               <div className="topup-meta">
                 <span className="topup-price">₩{pkg.price.toLocaleString()}</span>
                 {pkg.bonus > 0 && <span className="topup-bonus">보너스 +{pkg.bonus}</span>}
               </div>
-              <div className="topup-unit-price">{getUnitPrice(pkg.points, pkg.price)}</div>
+              <div className="topup-unit-price">{getUnitPrice(getTotalPoints(pkg), pkg.price)}</div>
               <button
                 className="topup-btn"
                 onClick={() => handleBuyPoints(pkg)}

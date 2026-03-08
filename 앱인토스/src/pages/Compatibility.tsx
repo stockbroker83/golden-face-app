@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserData, CompatibilityResult, PointsData } from "../types";
 import { analyzeCompatibility } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
+import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import "../styles/Compatibility.css";
 
 interface Props {
@@ -23,7 +23,7 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
   const [error, setError] = useState("");
 
   const remainingUses = getRemainingUses(points, "compatibility");
-  const costInfo = { cost: 100, remaining: remainingUses };
+  const costInfo = { cost: getFeatureCost("compatibility"), remaining: remainingUses };
 
   const handleSubmit = async () => {
     if (!partnerData.birth_date) {
@@ -78,7 +78,7 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
           </div>
           <h2>두 분의 궁합을 분석하고 있어요</h2>
           <p>사주와 관상 기운을 비교 중...</p>
-          {!isPaid && <span className="cost-badge">🏮 -100 복주머니</span>}
+          {!isPaid && <span className="cost-badge">🏮 -{costInfo.cost} 복주머니</span>}
           <div className="loading-dots">
             <span /><span /><span />
           </div>

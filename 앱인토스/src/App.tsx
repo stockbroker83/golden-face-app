@@ -169,7 +169,6 @@ function App() {
   // 데일리 관상 결과 저장
   const handleDailyResult = (result: DailyFortuneResult) => {
     setAppState((prev) => ({ ...prev, daily_fortune: result }));
-    earnPoints(10, "오늘의 관상 확인", "🔮");
   };
 
   // 궁합 결과 저장
@@ -183,7 +182,6 @@ function App() {
       compatibility_partner: partner,
       current_step: "compatibility_result",
     }));
-    earnPoints(15, "궁합 분석 완료", "💕");
   };
 
   // 심리테스트 결과 저장
@@ -193,7 +191,6 @@ function App() {
       psych_test_result: result,
       current_step: "psychtest_result",
     }));
-    earnPoints(20, "심리테스트 완료", "🧠");
   };
 
   return (

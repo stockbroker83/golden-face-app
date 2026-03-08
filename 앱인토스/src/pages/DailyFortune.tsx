@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { UserData, DailyFortuneResult, PointsData } from "../types";
 import { analyzeDailyFortune } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
+import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import "../styles/DailyFortune.css";
 
 interface Props {
@@ -22,7 +22,7 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
   const [needsPayment, setNeedsPayment] = useState(false);
 
   const remainingUses = getRemainingUses(points, "daily_fortune");
-  const costInfo = { cost: 50, remaining: remainingUses };
+  const costInfo = { cost: getFeatureCost("daily_fortune"), remaining: remainingUses };
 
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -123,7 +123,7 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
           <div className="loading-orb" />
           <p>오늘의 운세를 읽고 있어요...</p>
           <span className="loading-sub">{today}</span>
-          {!isPaid && <span className="cost-badge">🏮 -50 복주머니</span>}
+          {!isPaid && <span className="cost-badge">🏮 -{costInfo.cost} 복주머니</span>}
         </div>
       </div>
     );

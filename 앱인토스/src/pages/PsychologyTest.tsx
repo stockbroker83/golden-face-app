@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { UserData, PsychTestResult, PsychTestQuestion, PointsData } from "../types";
 import { analyzePsychTest } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
+import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import "../styles/PsychologyTest.css";
 
 interface Props {
@@ -102,7 +102,7 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
 
   const progress = ((currentQ) / QUESTIONS.length) * 100;
   const remainingUses = getRemainingUses(points, "psych_test");
-  const costInfo = { cost: 50, remaining: remainingUses };
+  const costInfo = { cost: getFeatureCost("psych_test"), remaining: remainingUses };
 
   const handleSelect = async (value: string, optionIdx: number) => {
     if (currentQ === 0 && answers.length === 0 && !isPaid) {

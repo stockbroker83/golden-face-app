@@ -95,7 +95,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>오늘의 관상</h3>
           <p>매일 달라지는 운세 흐름을<br />관상으로 확인해요</p>
-          <div className="card-points">+10 🏮</div>
+          <div className="card-points">-30 🏮</div>
         </button>
 
         {/* 2. 관상 분석 (기존) */}
@@ -118,7 +118,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>궁합 분석</h3>
           <p>두 사람의 관상으로<br />궁합을 확인해요</p>
-          <div className="card-points">+15 🏮</div>
+          <div className="card-points">-15 🏮</div>
         </button>
 
         {/* 4. 심리테스트 */}
@@ -130,7 +130,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>심리테스트</h3>
           <p>사주 기반 성격 유형<br />분석 테스트</p>
-          <div className="card-points">+20 🏮</div>
+          <div className="card-points">-15 🏮</div>
         </button>
       </section>
 
@@ -256,7 +256,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
             <div className="premium-badge">PREMIUM</div>
             <h3>관상 · 사주 · 타로 · 주역</h3>
             <p>종합 운명 리포트를 한 번에 확인하세요</p>
-            <span className="premium-price">₩19,000 → 오늘만 24% 할인</span>
+            <span className="premium-price">₩25,000 → 오늘만 ₩18,900</span>
           </div>
         </section>
       )}
