@@ -12,7 +12,7 @@ function getSessionId() {
   return id;
 }
 
-const CLIENT_KEY = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+const CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const AMOUNT = 1980;
 const ORDER_NAME = "타로 AI 마스터 프리미엄";
 
