@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:main": "vite --port 8080",
+    "dev:appintos": "npm run dev --prefix \"앱인토스\" -- --host 0.0.0.0 --port 8081",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
