@@ -21,13 +21,13 @@ cp .env.example .env.local
 2. `.env.local`에 API 키/결제 키를 추가합니다:
 
 ```
-VITE_ANTHROPIC_API_KEY=your_actual_api_key_here
+VITE_CLAUDE_PROXY_URL=https://<project-ref>.supabase.co/functions/v1/claude-proxy
+VITE_GEMINI_PROXY_URL=https://<project-ref>.supabase.co/functions/v1/gemini-proxy
 VITE_TOSS_CLIENT_KEY=your_toss_client_key
 VITE_TOSS_CONFIRM_API_URL=/api/toss/confirm
-TOSS_SECRET_KEY=your_toss_secret_key
 ```
 
-Claude API 키는 [Anthropic Console](https://console.anthropic.com)에서 얻을 수 있습니다.
+Claude/Gemini API 키는 프론트에 넣지 말고 Supabase Edge Function 시크릿으로만 관리하세요.
 
 토스페이먼츠 키는 Toss Payments 개발자센터에서 발급받을 수 있습니다.
 

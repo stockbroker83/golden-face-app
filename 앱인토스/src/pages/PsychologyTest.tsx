@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UserData, PsychTestResult, PsychTestQuestion, PointsData } from "../types";
 import { analyzePsychTest } from "../services/gemini";
 import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/PsychologyTest.css";
 
 interface Props {
@@ -105,23 +106,8 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
   const costInfo = { cost: getFeatureCost("psych_test"), remaining: remainingUses };
 
   const handleSelect = async (value: string, optionIdx: number) => {
-    if (currentQ === 0 && answers.length === 0 && !isPaid) {
-      const check = canUseFeature(points, "psych_test", false);
-      if (!check.allowed) {
-        setError(check.reason || "심리테스트를 시작할 수 없습니다.");
-        return;
-      }
-
-      const updatedPoints = useFeature(points, "psych_test", false);
-      if (!updatedPoints) {
-        setError("포인트 차감에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-
-      savePoints(updatedPoints);
-      onUpdatePoints(updatedPoints);
-    }
-
+    // 완전 무료 모드: 포인트 체크 생략
+    
     setSelectedOption(optionIdx);
 
     setTimeout(async () => {
@@ -133,9 +119,15 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
         setCurrentQ(currentQ + 1);
       } else {
         // 마지막 질문 - 결과 분석
+        if (!canUseAI()) {
+          setError("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
+          return;
+        }
+
         setLoading(true);
         try {
           const result = await analyzePsychTest(userData, newAnswers);
+          incrementMonthlyUsage();
           onResult(result);
         } catch (err) {
           console.error("심리테스트 분석 실패:", err);
@@ -212,28 +204,13 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
         <span className="q-count">{currentQ + 1}/{QUESTIONS.length}</span>
       </header>
 
-      {!isPaid && (
-        <div style={{
-          margin: "0 1.2rem 1rem",
-          background: "rgba(102,126,234,0.08)",
-          border: "1px solid rgba(102,126,234,0.25)",
-          borderRadius: "12px",
-          padding: "0.65rem 0.8rem",
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "0.82rem",
-          color: "rgba(240,236,228,0.9)"
-        }}>
-          <span>이용비용: 🏮 50개</span>
-          <span>오늘 남은 횟수: {costInfo.remaining}/5회</span>
+      <div className="psych-content">
+        <div className="question-card">
+          <span className="question-emoji">{q.emoji}</span>
+          <h2 className="question-text">{q.question}</h2>
         </div>
-      )}
 
-      <div className="question-area" key={currentQ}>
-        <span className="q-emoji">{q.emoji}</span>
-        <h2 className="q-text">{q.question}</h2>
-
-        <div className="options-list">
+        <div className="options-grid">
           {q.options.map((opt, idx) => (
             <button
               key={idx}

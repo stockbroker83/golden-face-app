@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import WelcomeScreen from "./pages/WelcomeScreen";
 import UserInfo from "./pages/UserInfo";
 import HomeHub from "./pages/HomeHub";
@@ -33,10 +33,13 @@ import {
   PsychTestResult,
 } from "./types";
 import { analyzeFacePremium } from "./services/gemini";
+import { canUseAI, incrementMonthlyUsage } from "./utils/monthlyUsageManager";
 import { loadPoints, savePoints, addPoints, addStreak, deductPoints } from "./utils/pointsManager";
-import { fetchServerAccountState, isVipActive, loadLocalVip } from "./services/accountState";
+import { fetchServerAccountState } from "./services/accountState";
 import { requestNotificationPermission } from "./utils/notificationManager";
 import "./App.css";
+
+const FREE_PREMIUM_MODE = true;
 
 const DEFAULT_POINTS: PointsData = {
   total_points: 0,
@@ -56,10 +59,11 @@ const DEFAULT_POINTS: PointsData = {
 };
 
 function App() {
+  const [isPremiumAnalyzing, setIsPremiumAnalyzing] = useState(false);
   const [appState, setAppState] = useState<AppState>({
     user_data: null,
     face_data: null,
-    is_paid: false,
+    is_paid: FREE_PREMIUM_MODE,
     current_step: "notice",
     daily_fortune: null,
     compatibility: null,
@@ -72,8 +76,6 @@ function App() {
   useEffect(() => {
     const savedUser = localStorage.getItem("golden_face_user");
     const savedPoints = loadPoints();
-    const localVip = loadLocalVip();
-    const localIsPaid = isVipActive(localVip);
 
     const hydrateFromServer = async () => {
       const serverState = await fetchServerAccountState();
@@ -82,7 +84,7 @@ function App() {
       setAppState((prev) => ({
         ...prev,
         points: serverState.points || prev.points,
-        is_paid: isVipActive(serverState.vip || null) || Boolean(serverState.is_vip),
+        is_paid: FREE_PREMIUM_MODE,
       }));
     };
 
@@ -93,7 +95,7 @@ function App() {
           ...prev,
           user_data: userData,
           points: savedPoints || DEFAULT_POINTS,
-          is_paid: localIsPaid,
+          is_paid: FREE_PREMIUM_MODE,
           current_step: "hub", // 기존 유저는 바로 허브로
         }));
 
@@ -130,18 +132,38 @@ function App() {
     }));
   };
 
-  const handlePremiumAnalyzingComplete = async () => {
+  const handlePremiumAnalyzingComplete = useCallback(async () => {
+    if (isPremiumAnalyzing) return;
+
     if (!appState.face_data?.image_file || !appState.user_data) {
       goToStep("free");
       return;
     }
-    const premiumAnalysis = await analyzeFacePremium(
-      appState.face_data.image_file,
-      appState.user_data
-    );
-    updateFaceData({ premium_analysis: premiumAnalysis });
-    goToStep("premium");
-  };
+
+    setIsPremiumAnalyzing(true);
+
+    try {
+      if (!canUseAI()) {
+        alert("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
+        goToStep("free");
+        return;
+      }
+
+      const premiumAnalysis = await analyzeFacePremium(
+        appState.face_data.image_file,
+        appState.user_data
+      );
+      incrementMonthlyUsage();
+      updateFaceData({ premium_analysis: premiumAnalysis });
+      goToStep("premium");
+    } catch (error) {
+      console.error("프리미엄 분석 실패:", error);
+      alert("프리미엄 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      goToStep("free");
+    } finally {
+      setIsPremiumAnalyzing(false);
+    }
+  }, [appState.face_data?.image_file, appState.user_data, isPremiumAnalyzing]);
 
   // 포인트 적립 핸들러
   const earnPoints = (amount: number, action: string, emoji: string) => {
@@ -249,12 +271,11 @@ function App() {
         )}
 
       {appState.current_step === "free" &&
-        appState.face_data?.free_analysis &&
+        (appState.face_data?.premium_analysis || appState.face_data?.free_analysis) &&
         appState.face_data?.image_file && (
           <FreeResult
-            analysis={appState.face_data.free_analysis}
+            analysis={appState.face_data.premium_analysis || appState.face_data.free_analysis!}
             imageFile={appState.face_data.image_file}
-            onUpgrade={() => goToStep("payment")}
             onBack={() => goToStep("hub")}
           />
         )}

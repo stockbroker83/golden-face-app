@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { UserData, DailyFortuneResult, PointsData } from "../types";
 import { analyzeDailyFortune } from "../services/gemini";
 import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/DailyFortune.css";
 
 interface Props {
@@ -40,29 +41,18 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
 
     // 새로 분석 시작
     const startAnalysis = async () => {
-      // 포인트 체크
-      const check = canUseFeature(points, "daily_fortune", isPaid);
-      if (!check.allowed) {
-        setError(check.reason || "사용할 수 없습니다.");
-        setNeedsPayment(true);
+      // 완전 무료 모드: 포인트 체크 생략
+      // 월간 사용량 체크
+      if (!canUseAI()) {
+        setError("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
         return;
-      }
-
-      // 포인트 차감
-      if (!isPaid) {
-        const updatedPoints = useFeature(points, "daily_fortune", false);
-        if (!updatedPoints) {
-          setError("포인트 차감에 실패했습니다.");
-          return;
-        }
-        savePoints(updatedPoints);
-        onUpdatePoints(updatedPoints);
       }
 
       // 분석 시작
       setLoading(true);
       try {
         const data = await analyzeDailyFortune(userData);
+        incrementMonthlyUsage();
         setResult(data);
         onResult(data);
       } catch (err) {
@@ -74,7 +64,7 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
     };
 
     startAnalysis();
-  }, [userData, points, isPaid]);
+  }, [userData]);
 
   // 에러 화면
   if (error) {
@@ -86,26 +76,8 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
         </header>
         <div className="daily-error">
           <span className="error-icon">⚠️</span>
-          <h2>{needsPayment ? "복주머니가 필요해요" : "이용 불가"}</h2>
+          <h2>오류가 발생했어요</h2>
           <p>{error}</p>
-          {!isPaid && (
-            <div className="error-info">
-              <div className="cost-info">
-                <span>필요한 복주머니</span>
-                <strong>🏮 {costInfo.cost}개</strong>
-              </div>
-              <div className="cost-info">
-                <span>보유 복주머니</span>
-                <strong style={{ color: points.total_points >= costInfo.cost ? "#10b981" : "#ef4444" }}>
-                  🏮 {points.total_points}개
-                </strong>
-              </div>
-              <div className="cost-info">
-                <span>오늘 남은 횟수</span>
-                <strong>{costInfo.remaining}/5회</strong>
-              </div>
-            </div>
-          )}
           <button className="error-btn" onClick={onBack}>돌아가기</button>
         </div>
       </div>
@@ -123,7 +95,6 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
           <div className="loading-orb" />
           <p>오늘의 운세를 읽고 있어요...</p>
           <span className="loading-sub">{today}</span>
-          {!isPaid && <span className="cost-badge">🏮 -{costInfo.cost} 복주머니</span>}
         </div>
       </div>
     );

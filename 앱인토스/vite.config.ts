@@ -14,5 +14,15 @@ export default defineConfig(({ mode }) => ({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
+    chunkSizeWarningLimit: 850,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          ai: ['@google/generative-ai', '@anthropic-ai/sdk'],
+          appintos: ['@apps-in-toss/web-framework'],
+        },
+      },
+    },
   }
 }))

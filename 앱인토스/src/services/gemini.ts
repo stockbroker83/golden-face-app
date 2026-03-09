@@ -1,9 +1,9 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FreeAnalysisResult, PremiumAnalysisResult, UserData, DailyFortuneResult, CompatibilityResult, PsychTestResult } from "../types";
 import type { TojeongResult } from "../pages/TojeongBigyeol";
 import type { DreamResult } from "../pages/DreamInterpretation";
 import type { SajuAnalysis, FourPillars } from "../utils/sajuCalculator";
 import { formatSajuForPrompt } from "../utils/sajuCalculator";
+import { callGeminiViaProxy } from "./geminiProxy";
 import {
   FreeAnalysisSchema,
   PremiumAnalysisSchema,
@@ -12,20 +12,26 @@ import {
   PsychTestSchema,
 } from "../types/schemas";
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+const GEMINI_PROXY_URL = import.meta.env.VITE_GEMINI_PROXY_URL || "";
+const HAS_GEMINI_PROXY = Boolean(GEMINI_PROXY_URL);
 
-function getModel() {
-  if (!API_KEY) return null;
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+async function requestGeminiText(
+  prompt: string,
+  options: { imageData?: string; mimeType?: string; timeoutMs?: number } = {}
+): Promise<string> {
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error("TIMEOUT")), options.timeoutMs ?? 30000);
+  });
+
+  const apiPromise = callGeminiViaProxy(prompt, options.imageData, options.mimeType);
+  return Promise.race([apiPromise, timeoutPromise]);
 }
 
 export async function analyzeFaceFree(
   imageFile: File,
   userData: UserData
 ): Promise<FreeAnalysisResult> {
-  const model = getModel();
-  if (!model) return createMockFreeAnalysis();
+  if (!HAS_GEMINI_PROXY) return createMockFreeAnalysis();
 
   try {
     // 파일 검증
@@ -88,19 +94,11 @@ export async function analyzeFaceFree(
 }
 `;
 
-    // 30초 타임아웃
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('TIMEOUT')), 30000);
+    const text = await requestGeminiText(prompt, {
+      imageData: imageBase64,
+      mimeType: imageFile.type || "image/jpeg",
+      timeoutMs: 30000,
     });
-
-    const apiPromise = model.generateContent([
-      { inlineData: { mimeType: imageFile.type || "image/jpeg", data: imageBase64 } },
-      { text: prompt },
-    ]);
-
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-
-    const text = result.response.text();
     const parsed = parseJson<FreeAnalysisResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
 
@@ -140,8 +138,7 @@ export async function analyzeFacePremium(
   imageFile: File,
   userData: UserData
 ): Promise<PremiumAnalysisResult> {
-  const model = getModel();
-  if (!model) return createMockPremiumAnalysis();
+  if (!HAS_GEMINI_PROXY) return createMockPremiumAnalysis();
 
   const readingTone = (import.meta.env.VITE_READING_TONE || "warm").toLowerCase();
 
@@ -217,19 +214,11 @@ export async function analyzeFacePremium(
 }
 `;
 
-    // 30초 타임아웃
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('TIMEOUT')), 30000);
+    const text = await requestGeminiText(prompt, {
+      imageData: imageBase64,
+      mimeType: imageFile.type || "image/jpeg",
+      timeoutMs: 30000,
     });
-
-    const apiPromise = model.generateContent([
-      { inlineData: { mimeType: imageFile.type || "image/jpeg", data: imageBase64 } },
-      { text: prompt },
-    ]);
-
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-
-    const text = result.response.text();
     const parsed = parseJson<PremiumAnalysisResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
 
@@ -491,11 +480,10 @@ function createMockPremiumAnalysis(): PremiumAnalysisResult {
 export async function analyzeDailyFortune(
   userData: UserData
 ): Promise<DailyFortuneResult> {
-  const model = getModel();
   const today = new Date().toISOString().split("T")[0];
   const dayName = new Date().toLocaleDateString("ko-KR", { weekday: "long" });
 
-  if (!model) return createMockDailyFortune(today);
+  if (!HAS_GEMINI_PROXY) return createMockDailyFortune(today);
 
   try {
     const prompt = `
@@ -562,13 +550,7 @@ export async function analyzeDailyFortune(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 30000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 30000 });
     const parsed = parseJson<DailyFortuneResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
 
@@ -624,8 +606,7 @@ export async function analyzeCompatibility(
   myData: UserData,
   partnerData: UserData
 ): Promise<CompatibilityResult> {
-  const model = getModel();
-  if (!model) return createMockCompatibility();
+  if (!HAS_GEMINI_PROXY) return createMockCompatibility();
 
   try {
     const prompt = `
@@ -695,13 +676,7 @@ export async function analyzeCompatibility(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 30000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 30000 });
     const parsed = parseJson<CompatibilityResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
 
@@ -759,14 +734,13 @@ export async function analyzePsychTest(
   userData: UserData,
   answers: string[]
 ): Promise<PsychTestResult> {
-  const model = getModel();
 
   // 오행 집계
   const counts: Record<string, number> = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
   answers.forEach((a) => { counts[a] = (counts[a] || 0) + 1; });
   const dominant = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
 
-  if (!model) return createMockPsychResult(dominant);
+  if (!HAS_GEMINI_PROXY) return createMockPsychResult(dominant);
 
   try {
     const prompt = `
@@ -793,13 +767,7 @@ export async function analyzePsychTest(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 30000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 30000 });
     const parsed = parseJson<PsychTestResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
 
@@ -871,8 +839,7 @@ function createMockPsychResult(dominant: string): PsychTestResult {
 export async function analyzeTojeong(
   userData: UserData
 ): Promise<TojeongResult> {
-  const model = getModel();
-  if (!model) return createMockTojeong();
+  if (!HAS_GEMINI_PROXY) return createMockTojeong();
 
   try {
     const prompt = `
@@ -902,13 +869,7 @@ export async function analyzeTojeong(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 30000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 30000 });
     const parsed = parseJson<TojeongResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
     return sanitizeTojeong(parsed);
@@ -953,8 +914,7 @@ function createMockTojeong(): TojeongResult {
 export async function analyzeDream(
   dreamText: string
 ): Promise<DreamResult> {
-  const model = getModel();
-  if (!model) return createMockDream();
+  if (!HAS_GEMINI_PROXY) return createMockDream();
 
   try {
     const prompt = `
@@ -975,13 +935,7 @@ export async function analyzeDream(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 30000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 30000 });
     const parsed = parseJson<DreamResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
     return sanitizeDream(parsed);
@@ -1052,8 +1006,7 @@ export async function analyzeSajuWithAI(
   name: string,
   gender: 'male' | 'female'
 ): Promise<SajuAIResult> {
-  const model = getModel();
-  if (!model) return createMockSajuAI();
+  if (!HAS_GEMINI_PROXY) return createMockSajuAI();
 
   const readingTone = (import.meta.env.VITE_READING_TONE || "warm").toLowerCase();
 
@@ -1094,13 +1047,7 @@ ${sajuText}
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 40000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 40000 });
     const parsed = parseJson<SajuAIResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
     return sanitizeSajuAI(parsed);
@@ -1118,8 +1065,7 @@ export async function analyzeSajuCompatibilityWithAI(
   compatibilityScore: number,
   compatibilityDetails: string[]
 ): Promise<SajuCompatibilityAIResult> {
-  const model = getModel();
-  if (!model) return createMockSajuCompatibilityAI();
+  if (!HAS_GEMINI_PROXY) return createMockSajuCompatibilityAI();
 
   try {
     const prompt = `
@@ -1158,13 +1104,7 @@ export async function analyzeSajuCompatibilityWithAI(
 }
 `;
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("TIMEOUT")), 40000);
-    });
-
-    const apiPromise = model.generateContent([{ text: prompt }]);
-    const result = await Promise.race([apiPromise, timeoutPromise]);
-    const text = result.response.text();
+    const text = await requestGeminiText(prompt, { timeoutMs: 40000 });
     const parsed = parseJson<SajuCompatibilityAIResult>(text);
     if (!parsed) throw new Error("JSON 형식 오류");
     return sanitizeSajuCompatibilityAI(parsed);

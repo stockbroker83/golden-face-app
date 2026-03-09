@@ -3,6 +3,7 @@ import { PointsData } from "../types";
 import { analyzeSaju, type SajuAnalysis, type WuXing } from "../utils/sajuCalculator";
 import { analyzeSajuWithAI, type SajuAIResult } from "../services/gemini";
 import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/ExtraFeatures.css";
 
 interface SajuProps {
@@ -46,21 +47,11 @@ export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuPro
       return;
     }
 
-    if (!isPaid) {
-      const check = canUseFeature(points, "saju", false);
-      if (!check.allowed) {
-        setError(check.reason || "사주 분석을 시작할 수 없습니다.");
-        return;
-      }
-
-      const updatedPoints = useFeature(points, "saju", false);
-      if (!updatedPoints) {
-        setError("포인트 차감에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-
-      savePoints(updatedPoints);
-      onUpdatePoints(updatedPoints);
+    // 완전 무료 모드: 포인트 체크 생략
+    // 월간 사용량 체크
+    if (!canUseAI()) {
+      setError("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
+      return;
     }
 
     setLoading(true);
@@ -69,6 +60,7 @@ export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuPro
       setSajuAnalysis(analysis);
 
       const aiAnalysis = await analyzeSajuWithAI(analysis, name, gender);
+      incrementMonthlyUsage();
       setAiResult(aiAnalysis);
 
       setStep('result');

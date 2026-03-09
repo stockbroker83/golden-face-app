@@ -1,9 +1,18 @@
 import { PointsData, PointHistory } from "../types";
 import { grantVipOnServer, saveLocalVip, syncPointsToServer } from "../services/accountState";
 
+// ==========================================
+// ⚠️ 포인트 제도 완전 무료화 ⚠️
+// 모든 기능이 무료로 제공되므로 포인트 체크를 무력화합니다
+// ==========================================
+
 const STORAGE_KEY = "golden_face_points";
+const FREE_MODE = true;  // 완전 무료 모드 활성화
 
 export function loadPoints(): PointsData | null {
+  if (FREE_MODE) {
+    return getDefaultPointsData();  // 항상 무제한 포인트 반환
+  }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
@@ -14,6 +23,7 @@ export function loadPoints(): PointsData | null {
 }
 
 export function savePoints(data: PointsData): void {
+  if (FREE_MODE) return;  // 무료 모드에서는 저장 안 함
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   void syncPointsToServer(data);
 }
@@ -24,6 +34,8 @@ export function addPoints(
   action: string,
   emoji: string
 ): PointsData {
+  if (FREE_MODE) return current;  // 무료 모드에서는 그냥 반환
+  
   const today = new Date().toISOString().split("T")[0];
   const entry: PointHistory = { date: today, action, points: amount, emoji };
   const isNewDay = current.last_daily_claim !== today;
@@ -38,6 +50,11 @@ export function addPoints(
 }
 
 export function checkStreak(current: PointsData) {
+  if (FREE_MODE) {
+    // 무료 모드에서는 항상 클레임 불가 (필요 없음)
+    return { canClaim: false, nextStreak: 0, reset: false };
+  }
+  
   const today = new Date().toISOString().split("T")[0];
   const yesterdayDate = new Date();
   yesterdayDate.setDate(yesterdayDate.getDate() - 1);
@@ -102,6 +119,18 @@ export interface StreakReward {
 }
 
 export function addStreak(current: PointsData) {
+  if (FREE_MODE) {
+    // 무료 모드에서는 스트릭 시스템 비활성화
+    return { 
+      updated: current, 
+      bonusPoints: 0, 
+      rewardLabel: '', 
+      emoji: '', 
+      unlockedPremium: false,
+      streakDay: 0 
+    };
+  }
+  
   const today = new Date().toISOString().split("T")[0];
   const streakInfo = checkStreak(current);
 
@@ -169,6 +198,7 @@ export function addStreak(current: PointsData) {
 }
 
 export function canClaimDaily(current: PointsData): boolean {
+  if (FREE_MODE) return false;  // 무료 모드에서는 필요 없음
   return checkStreak(current).canClaim;
 }
 
@@ -181,6 +211,8 @@ export function deductPoints(
   reason: string,
   emoji: string
 ): PointsData | null {
+  if (FREE_MODE) return current;  // 무료 모드에서는 차감 없이 그냥 반환
+  
   if (current.total_points < amount) {
     return null; // Insufficient points
   }
@@ -271,6 +303,11 @@ export function canUseFeature(
   featureType: UsageType,
   isPremium: boolean = false
 ): { allowed: boolean; reason?: string } {
+  // 완전 무료 모드: 항상 허용
+  if (FREE_MODE) {
+    return { allowed: true };
+  }
+  
   // 프리미엄은 무제한
   if (isPremium) {
     return { allowed: true };
@@ -313,6 +350,11 @@ export function useFeature(
   featureType: UsageType,
   isPremium: boolean = false
 ): PointsData | null {
+  // 완전 무료 모드: 항상 성공
+  if (FREE_MODE) {
+    return points;
+  }
+  
   // 프리미엄은 포인트 차감 없이 사용만 기록
   if (isPremium) {
     return points; // 그냥 통과

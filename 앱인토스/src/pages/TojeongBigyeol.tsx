@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserData } from "../types";
 import { analyzeTojeong } from "../services/gemini";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/ExtraFeatures.css";
 
 interface Props {
@@ -26,8 +27,14 @@ export default function TojeongBigyeol({ userData, onBack, onEarnPoints }: Props
 
   useEffect(() => {
     const fetchResult = async () => {
+      if (!canUseAI()) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const data = await analyzeTojeong(userData);
+        incrementMonthlyUsage();
         setResult(data);
         onEarnPoints(15, "토정비결 확인", "📜");
       } catch (err) {

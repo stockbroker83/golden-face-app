@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { analyzeFaceFree } from "../services/gemini";
 import { FaceAnalysisResult, UserData } from "../types";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/FaceAnalyzing.css";
 
 type FaceAnalyzingProps = {
@@ -25,10 +26,16 @@ export default function FaceAnalyzing({ imageFile, userData, onComplete }: FaceA
           throw new Error("사용자 정보가 없습니다.");
         }
 
+        if (!canUseAI()) {
+          throw new Error("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
+        }
+
         const [result] = await Promise.all([
           analyzeFaceFree(imageFile, userData),
           new Promise((resolve) => setTimeout(resolve, 5000)),
         ]);
+
+        incrementMonthlyUsage();
 
         if (mounted) onComplete(result);
       } catch (e) {

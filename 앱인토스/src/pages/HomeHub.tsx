@@ -56,32 +56,12 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
             <span className="brand-icon">✨</span>
             <span className="brand-name">금빛관상</span>
           </div>
-          <button className="points-badge" onClick={() => onNavigate("points")}>
-            <span className="points-icon">🏮</span>
-            <span className="points-count">{points.total_points}</span>
-          </button>
         </div>
 
         <div className="hub-greeting">
           <h1>{getTimeGreeting()}이에요, {userData.name || "소중한 분"}</h1>
           <p className="greeting-sub">{greeting}</p>
-          <div className="streak-highlight">🔥 {points.streak_days}일 연속 출석 중!</div>
         </div>
-
-        {/* 출석 체크 */}
-        {showClaim && (
-          <button
-            className={`daily-claim-btn ${claimAnimation ? "claiming" : ""}`}
-            onClick={handleClaim}
-          >
-            <span className="claim-icon">📅</span>
-            <div className="claim-text">
-              <strong>오늘의 출석 체크</strong>
-              <span>+5 복주머니 받기 · {points.streak_days + 1}일 연속</span>
-            </div>
-            <span className="claim-arrow">→</span>
-          </button>
-        )}
       </header>
 
       {/* ── 메인 메뉴 카드 ── */}
@@ -95,7 +75,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>오늘의 관상</h3>
           <p>매일 달라지는 운세 흐름을<br />관상으로 확인해요</p>
-          <div className="card-points">-20 🏮</div>
+          <div className="card-points">무료</div>
         </button>
 
         {/* 2. 관상 분석 (기존) */}
@@ -106,7 +86,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>AI 관상 분석</h3>
           <p>사진 1장으로<br />12부위 상세 분석</p>
-          <div className="card-points">-50 🏮</div>
+          <div className="card-points">무료</div>
         </button>
 
         {/* 3. 궁합 분석 */}
@@ -118,7 +98,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>궁합 분석</h3>
           <p>두 사람의 관상으로<br />궁합을 확인해요</p>
-          <div className="card-points">-30 🏮</div>
+          <div className="card-points">무료</div>
         </button>
 
         {/* 4. 심리테스트 */}
@@ -130,7 +110,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
           <h3>심리테스트</h3>
           <p>사주 기반 성격 유형<br />분석 테스트</p>
-          <div className="card-points">-15 🏮</div>
+          <div className="card-points">무료</div>
         </button>
       </section>
 
@@ -143,7 +123,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>사주팔자</strong>
               <span>천간지지 & 대운 분석</span>
             </div>
-            <span className="mini-points">-20 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("saju_compatibility")}>
@@ -152,7 +131,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>사주 궁합</strong>
               <span>2인 사주 비교 분석</span>
             </div>
-            <span className="mini-points">-25 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("lucky_numbers")}>
@@ -161,7 +139,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운의 번호</strong>
               <span>사주 기반 번호 추천</span>
             </div>
-            <span className="mini-points">-10 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("charm")}>
@@ -170,7 +147,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운 부적</strong>
               <span>오늘의 행운 부적</span>
             </div>
-            <span className="mini-points">-10 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("tojeong")}>
@@ -179,7 +155,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>토정비결</strong>
               <span>2026년 월별 운세</span>
             </div>
-            <span className="mini-points">-15 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("dream")}>
@@ -188,7 +163,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>꿈해몽</strong>
               <span>꿈 풀이 해석</span>
             </div>
-            <span className="mini-points">-10 🏮</span>
+
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("lucky_style")}>
@@ -197,7 +172,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>행운의 코디</strong>
               <span>오늘의 스타일 추천</span>
             </div>
-            <span className="mini-points">-5 🏮</span>
           </button>
 
           <button className="hub-mini-card" onClick={() => onNavigate("wish_wall")}>
@@ -206,7 +180,7 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
               <strong>소원의 담벼락</strong>
               <span>소원 적고 응원받기</span>
             </div>
-            <span className="mini-points">+1 🏮</span>
+
           </button>
         </div>
       </section>
@@ -247,36 +221,6 @@ export default function HomeHub({ userData, points, isPaid, onNavigate, onClaimD
           </div>
         </div>
       </section>
-
-      {/* ── 복주머니 현황 ── */}
-      <section className="hub-points-section" onClick={() => onNavigate("points")}>
-        <div className="points-summary">
-          <div className="points-left">
-            <span className="points-big-icon">🏮</span>
-            <div>
-              <strong>내 복주머니</strong>
-              <span className="points-total">{points.total_points}개</span>
-            </div>
-          </div>
-          <div className="points-right">
-            <span className="streak-badge">🔥 {points.streak_days}일 연속 출석 중!</span>
-            <span className="points-arrow">›</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 하단 결제 광고 ── */}
-      {!isPaid && (
-        <section className="hub-premium-banner" onClick={() => onNavigate("upload")}>
-          <div className="premium-banner-bg" />
-          <div className="premium-banner-content">
-            <div className="premium-badge">PREMIUM</div>
-            <h3>관상 · 사주 · 타로 · 주역</h3>
-            <p>종합 운명 리포트를 한 번에 확인하세요</p>
-            <span className="premium-price">₩19,900 → 오늘만 ₩9,900</span>
-          </div>
-        </section>
-      )}
 
       {/* ── 하단 안내 ── */}
       <footer className="hub-footer">

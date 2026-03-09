@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UserData, CompatibilityResult, PointsData } from "../types";
 import { analyzeCompatibility } from "../services/gemini";
 import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/Compatibility.css";
 
 interface Props {
@@ -31,22 +32,11 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
       return;
     }
 
-    // 포인트 체크
-    const check = canUseFeature(points, "compatibility", isPaid);
-    if (!check.allowed) {
-      setError(check.reason || "사용할 수 없습니다.");
+    // 완전 무료 모드: 포인트 체크 생략
+    // 월간 사용량 체크
+    if (!canUseAI()) {
+      setError("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
       return;
-    }
-
-    // 포인트 차감 (프리미엄은 제외)
-    if (!isPaid) {
-      const updatedPoints = useFeature(points, "compatibility", false);
-      if (!updatedPoints) {
-        setError("포인트 차감에 실패했습니다.");
-        return;
-      }
-      savePoints(updatedPoints);
-      onUpdatePoints(updatedPoints);
     }
 
     setLoading(true);
@@ -59,6 +49,7 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
         lunar: partnerData.lunar || false,
       };
       const result = await analyzeCompatibility(myData, partner);
+      incrementMonthlyUsage();
       onResult(result, partner);
     } catch (err) {
       setError("분석 중 오류가 발생했습니다. 다시 시도해주세요.");
@@ -114,26 +105,6 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
 
       <div className="compat-form">
         <h2>상대방 정보 입력</h2>
-
-        {/* 비용 정보 */}
-        {!isPaid && (
-          <div className="cost-display">
-            <div className="cost-item">
-              <span>필요한 복주머니</span>
-              <strong>🏮 {costInfo.cost}개</strong>
-            </div>
-            <div className="cost-item">
-              <span>보유 복주머니</span>
-              <strong style={{ color: points.total_points >= costInfo.cost ? "#10b981" : "#ef4444" }}>
-                🏮 {points.total_points}개
-              </strong>
-            </div>
-            <div className="cost-item">
-              <span>오늘 남은 횟수</span>
-              <strong>{costInfo.remaining}/3회</strong>
-            </div>
-          </div>
-        )}
 
         <div className="form-group">
           <label>생년월일</label>

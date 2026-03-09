@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas";
-
 export type OGImageType = "face" | "compatibility" | "psych";
 
 export interface OGImageOptions {
@@ -41,6 +39,8 @@ async function drawQrToCanvas(target: HTMLCanvasElement, shareUrl: string) {
 }
 
 export async function generateOGImage(options: OGImageOptions): Promise<Blob> {
+  const { default: html2canvas } = await import("html2canvas");
+
   const wrapper = document.createElement("div");
   wrapper.style.position = "fixed";
   wrapper.style.left = "-10000px";

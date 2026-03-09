@@ -1,4 +1,3 @@
-import html2pdf from 'html2pdf.js';
 import type { PremiumAnalysisResult, UserData } from '../types';
 
 export async function generatePDF(
@@ -6,6 +5,7 @@ export async function generatePDF(
   userData: UserData,
   imageFile: string
 ): Promise<Blob> {
+  const { default: html2pdf } = await import('html2pdf.js');
   
   const htmlContent = `
     <!DOCTYPE html>

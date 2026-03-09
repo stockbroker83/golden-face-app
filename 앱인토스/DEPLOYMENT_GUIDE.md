@@ -54,12 +54,14 @@
 
 #### 3. Gemini API 보안 설정 (프로덕션 배포 시)
 
-**현재 상태**: ⚠️ API 키가 클라이언트에 노출됨 (개발용은 OK)
+**현재 상태**: ✅ 프록시 전용 구성 권장 (클라이언트 키 저장 금지)
 
 **프로덕션 배포 전 필수**:
 - [ ] Supabase Edge Function 배포
 - [ ] VITE_GEMINI_PROXY_URL 환경 변수 설정
+- [ ] VITE_CLAUDE_PROXY_URL 환경 변수 설정
 - [ ] Supabase 시크릿에 GEMINI_API_KEY 등록
+- [ ] Supabase 시크릿에 ANTHROPIC_API_KEY 등록
 
 자세한 방법: [GEMINI_SECURITY.md](./GEMINI_SECURITY.md) 참고
 
@@ -68,12 +70,12 @@
 `.env.local` 파일 체크:
 
 ```bash
-# 개발 환경 (현재)
-VITE_GEMINI_API_KEY=AIzaSy...
+# 클라이언트에는 프록시 URL만 설정
+VITE_CLAUDE_PROXY_URL=https://xxx.supabase.co/functions/v1/claude-proxy
+VITE_GEMINI_PROXY_URL=https://xxx.supabase.co/functions/v1/gemini-proxy
 VITE_TOSS_CLIENT_KEY=test_ck_...
 
 # 프로덕션 추가 필요
-VITE_GEMINI_PROXY_URL=https://xxx.supabase.co/functions/v1/gemini-proxy
 VITE_TOSS_CONFIRM_API_URL=https://xxx.supabase.co/functions/v1/confirm-payment
 VITE_ACCOUNT_API_BASE_URL=https://xxx.supabase.co/functions/v1
 ```
@@ -141,8 +143,8 @@ npm run ait:build
 → SKU 코드가 정확히 일치하는지 확인
 
 ### "Gemini API 오류가 나요"
-→ .env.local에 VITE_GEMINI_API_KEY 설정 확인
-→ API 키 할당량 확인 (일 1,500 요청)
+→ .env.local에 VITE_GEMINI_PROXY_URL 설정 확인
+→ Supabase Function 시크릿 GEMINI_API_KEY 확인
 
 ### "포인트가 저장되지 않아요"
 → granite.config.ts에 Storage 권한 추가 확인

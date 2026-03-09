@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { IAP } from "@apps-in-toss/web-framework";
 import { PointsData } from "../types";
 import PricingCard from "../components/PricingCard";
@@ -12,6 +12,11 @@ interface Props {
   onUpdatePoints: (points: PointsData) => void;
   onPaymentSuccess: () => void;
   onBack: () => void;
+}
+
+interface ConfirmApiError {
+  message?: string;
+  code?: string;
 }
 
 const PREMIUM_POINTS_PRICE = 2200;
@@ -61,6 +66,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [canUseTestBypass, setCanUseTestBypass] = useState(false);
+  const grantedOrderIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -86,6 +92,12 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
   }, []);
 
   const grantVip = (orderId: string) => {
+    if (grantedOrderIdsRef.current.has(orderId)) {
+      return;
+    }
+
+    grantedOrderIdsRef.current.add(orderId);
+
     const vip = {
       user_id: String(Date.now()),
       is_vip: true,
@@ -95,6 +107,19 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
 
     saveLocalVip(vip);
     void grantVipOnServer(vip);
+  };
+
+  const parseConfirmError = async (response: Response): Promise<string> => {
+    try {
+      const payload = (await response.json()) as ConfirmApiError;
+      if (payload.message) {
+        return payload.code ? `${payload.message} (${payload.code})` : payload.message;
+      }
+    } catch {
+      // ignore parse failure
+    }
+
+    return "결제 승인 검증에 실패했습니다.";
   };
 
   const proceedWithTestBypass = () => {
@@ -108,6 +133,15 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
       setIsProcessing(true);
       setError(null);
 
+      const numericAmount = Number(amount);
+      if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
+        throw new Error("결제 금액 정보가 올바르지 않습니다.");
+      }
+
+      if (numericAmount !== PREMIUM_CASH_PRICE) {
+        throw new Error("결제 금액이 상품 가격과 일치하지 않습니다.");
+      }
+
       if (!TOSS_CONFIRM_API_URL && !import.meta.env.DEV) {
         throw new Error("운영 환경에서는 결제 승인 API(VITE_TOSS_CONFIRM_API_URL) 설정이 필요합니다. (정적 호스팅에서는 서버 엔드포인트를 별도 배포해야 합니다.)");
       }
@@ -116,11 +150,11 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
         const response = await fetch(TOSS_CONFIRM_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentKey, orderId, amount: Number(amount) }),
+          body: JSON.stringify({ paymentKey, orderId, amount: numericAmount }),
         });
 
         if (!response.ok) {
-          throw new Error("결제 승인 검증에 실패했습니다.");
+          throw new Error(await parseConfirmError(response));
         }
       }
 
@@ -192,10 +226,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
       const cleanup = IAP.createOneTimePurchaseOrder({
         options: {
           sku: "premium_fortune",
-          processProductGrant: ({ orderId }) => {
-            grantVip(orderId);
-            return true;
-          },
+          processProductGrant: () => true,
         },
         onEvent: (event) => {
           grantVip(event.data.orderId);
@@ -295,7 +326,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
 
   return (
     <div className="page payment-page">
-      <button className="btn-back" onClick={onBack}>← 뒤로</button>
+      <button className="btn-back" onClick={onBack} disabled={isProcessing}>← 뒤로</button>
 
       <div className="payment-hero">
         <div className="trust-top-row">

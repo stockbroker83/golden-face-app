@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { analyzeDream } from "../services/gemini";
+import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/ExtraFeatures.css";
 
 interface Props {
@@ -34,9 +35,16 @@ export default function DreamInterpretation({ onBack, onEarnPoints }: Props) {
 
   const handleAnalyze = async () => {
     if (!dreamText.trim()) return;
+
+    if (!canUseAI()) {
+      alert("이번 달 AI 분석 횟수를 모두 사용했습니다. (월 150회 제한)");
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await analyzeDream(dreamText);
+      incrementMonthlyUsage();
       setResult(data);
       onEarnPoints(10, "꿈해몽 분석", "🌙");
     } catch (err) {
