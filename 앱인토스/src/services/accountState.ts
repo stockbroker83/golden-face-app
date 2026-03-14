@@ -1,14 +1,12 @@
-import { PointsData, VIPMembership } from "../types";
+import { VIPMembership } from "../types";
 
 const ACCOUNT_API_BASE_URL = import.meta.env.VITE_ACCOUNT_API_BASE_URL || "";
 const USER_ID_KEY = "golden_face_user_id";
 const VIP_KEY = "golden_face_vip";
 const STATE_ENDPOINT = "/account-state";
-const POINTS_SYNC_ENDPOINT = "/account-points-sync";
 const VIP_GRANT_ENDPOINT = "/account-vip-grant";
 
 interface AccountStatePayload {
-  points?: PointsData;
   is_vip?: boolean;
   vip?: VIPMembership;
 }
@@ -77,23 +75,6 @@ export async function fetchServerAccountState(): Promise<AccountStatePayload | n
     return (await response.json()) as AccountStatePayload;
   } catch {
     return null;
-  }
-}
-
-export async function syncPointsToServer(points: PointsData): Promise<void> {
-  if (!ACCOUNT_API_BASE_URL) return;
-
-  try {
-    await fetch(`${ACCOUNT_API_BASE_URL}${POINTS_SYNC_ENDPOINT}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: getOrCreateUserId(),
-        points,
-      }),
-    });
-  } catch {
-    return;
   }
 }
 

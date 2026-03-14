@@ -5,7 +5,6 @@ import "../styles/ExtraFeatures.css";
 interface Props {
   userData: UserData;
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
 }
 
 interface StyleResult {
@@ -22,7 +21,7 @@ interface StyleResult {
   overall_tip: string;
 }
 
-export default function LuckyStyle({ userData, onBack, onEarnPoints }: Props) {
+export default function LuckyStyle({ userData, onBack }: Props) {
   const [result, setResult] = useState<StyleResult | null>(null);
 
   useEffect(() => {
@@ -108,7 +107,6 @@ export default function LuckyStyle({ userData, onBack, onEarnPoints }: Props) {
       overall_tip: pick(tips, 4),
     });
 
-    onEarnPoints(5, "행운의 코디 확인", "👔");
   }, [userData]);
 
   if (!result) return null;

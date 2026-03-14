@@ -148,7 +148,7 @@ export default function FaceUpload({ onUpload, onBack }: FaceUploadProps) {
         ref={cameraInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
+        capture="user"
         onChange={handleFileChange}
         className="hidden-input"
       />

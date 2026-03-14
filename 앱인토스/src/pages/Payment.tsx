@@ -1,15 +1,11 @@
 ﻿import { useEffect, useRef, useState } from "react";
 import { IAP } from "@apps-in-toss/web-framework";
-import { PointsData } from "../types";
 import PricingCard from "../components/PricingCard";
 import { vibrateLight, vibrateSuccess, vibrateError } from "../utils/haptic";
 import { grantVipOnServer, saveLocalVip } from "../services/accountState";
-import { deductPoints, savePoints } from "../utils/pointsManager";
 import "../styles/Payment.css";
 
 interface Props {
-  points: PointsData;
-  onUpdatePoints: (points: PointsData) => void;
   onPaymentSuccess: () => void;
   onBack: () => void;
 }
@@ -19,7 +15,6 @@ interface ConfirmApiError {
   code?: string;
 }
 
-const PREMIUM_POINTS_PRICE = 2200;
 const PREMIUM_CASH_PRICE = 9900;
 
 const BENEFITS = [
@@ -62,7 +57,7 @@ declare global {
   }
 }
 
-export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBack }: Props) {
+export default function Payment({ onPaymentSuccess, onBack }: Props) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [canUseTestBypass, setCanUseTestBypass] = useState(false);
@@ -225,7 +220,7 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
     try {
       const cleanup = IAP.createOneTimePurchaseOrder({
         options: {
-          sku: "premium_fortune",
+          sku: "ait.0000021956.bfd9add4.fa1d7631dd.3069720915",
           processProductGrant: () => true,
         },
         onEvent: (event) => {
@@ -289,40 +284,6 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
     }
   };
 
-  const handlePointsPayment = () => {
-    if (isProcessing) return;
-
-    setError(null);
-    setCanUseTestBypass(false);
-
-    if (points.total_points < PREMIUM_POINTS_PRICE) {
-      setError(`복주머니가 부족합니다. (필요: ${PREMIUM_POINTS_PRICE}개, 보유: ${points.total_points}개)`);
-      vibrateError();
-      return;
-    }
-
-    setIsProcessing(true);
-
-    try {
-      const updated = deductPoints(points, PREMIUM_POINTS_PRICE, "프리미엄 구매(복주머니)", "🏮");
-      if (!updated) {
-        setError("복주머니 차감에 실패했습니다. 다시 시도해주세요.");
-        vibrateError();
-        setIsProcessing(false);
-        return;
-      }
-
-      savePoints(updated);
-      onUpdatePoints(updated);
-      grantVip(`POINTS_${Date.now()}`);
-      vibrateSuccess();
-      onPaymentSuccess();
-    } catch {
-      setError("복주머니 결제 처리 중 오류가 발생했습니다.");
-      vibrateError();
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <div className="page payment-page">
@@ -370,10 +331,6 @@ export default function Payment({ points, onUpdatePoints, onPaymentSuccess, onBa
 
         <button className="btn-payment" onClick={handlePayment} disabled={isProcessing}>
           {isProcessing ? "결제 처리 중..." : `₩${PREMIUM_CASH_PRICE.toLocaleString()}로 전체 운세 확인하기`}
-        </button>
-
-        <button className="btn-points-payment" onClick={handlePointsPayment} disabled={isProcessing}>
-          {isProcessing ? "처리 중..." : `🏮 ${PREMIUM_POINTS_PRICE.toLocaleString()}개로 프리미엄 열기 (보유 ${points.total_points.toLocaleString()}개)`}
         </button>
 
         <section className="faq-section">

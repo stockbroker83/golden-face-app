@@ -5,7 +5,6 @@ import "../styles/ExtraFeatures.css";
 
 interface Props {
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
 }
 
 export interface DreamResult {
@@ -28,7 +27,7 @@ const DREAM_CATEGORIES = [
   { emoji: "🏠", label: "집/건물 꿈" },
 ];
 
-export default function DreamInterpretation({ onBack, onEarnPoints }: Props) {
+export default function DreamInterpretation({ onBack }: Props) {
   const [dreamText, setDreamText] = useState("");
   const [result, setResult] = useState<DreamResult | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +45,6 @@ export default function DreamInterpretation({ onBack, onEarnPoints }: Props) {
       const data = await analyzeDream(dreamText);
       incrementMonthlyUsage();
       setResult(data);
-      onEarnPoints(10, "꿈해몽 분석", "🌙");
     } catch (err) {
       console.error("꿈 분석 실패:", err);
     } finally {

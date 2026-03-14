@@ -5,7 +5,6 @@ import "../styles/ExtraFeatures.css";
 interface Props {
   userData: UserData;
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
 }
 
 const CHARMS = [
@@ -65,14 +64,13 @@ const CHARMS = [
   },
 ];
 
-export default function DigitalCharm({ userData, onBack, onEarnPoints }: Props) {
+export default function DigitalCharm({ userData, onBack }: Props) {
   const [selected, setSelected] = useState<typeof CHARMS[0] | null>(null);
   const [activated, setActivated] = useState(false);
   const displayName = userData.name?.trim() || "나";
 
   const handleActivate = () => {
     setActivated(true);
-    onEarnPoints(10, `${selected!.name} 활성화`, "🧧");
   };
 
   const handleShare = async () => {
@@ -84,7 +82,6 @@ export default function DigitalCharm({ userData, onBack, onEarnPoints }: Props) 
     if (navigator.share) {
       try {
         await navigator.share({ title: `금빛관상 ${selected.name}`, text: shareText });
-        onEarnPoints(5, "부적 공유", "📤");
       } catch {}
     } else {
       // 클립보드 복사

@@ -5,10 +5,9 @@ import "../styles/ExtraFeatures.css";
 interface Props {
   userData: UserData;
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
 }
 
-export default function LuckyNumbers({ userData, onBack, onEarnPoints }: Props) {
+export default function LuckyNumbers({ userData, onBack }: Props) {
   const [numbers, setNumbers] = useState<number[][] | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -35,7 +34,6 @@ export default function LuckyNumbers({ userData, onBack, onEarnPoints }: Props) 
       setNumbers(sets);
       setIsGenerating(false);
       setTimeout(() => setShowResult(true), 100);
-      onEarnPoints(10, "행운의 번호 생성", "🎰");
     }, 2000);
   };
 
@@ -76,7 +74,6 @@ export default function LuckyNumbers({ userData, onBack, onEarnPoints }: Props) 
               <>🎰 행운의 번호 뽑기</>
             )}
           </button>
-          <span className="action-points">+10 🏮</span>
         </div>
       )}
 

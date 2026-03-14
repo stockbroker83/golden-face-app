@@ -1,17 +1,13 @@
 import { useState } from "react";
-import { UserData, PsychTestResult, PsychTestQuestion, PointsData } from "../types";
+import { UserData, PsychTestResult, PsychTestQuestion } from "../types";
 import { analyzePsychTest } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/PsychologyTest.css";
 
 interface Props {
   userData: UserData;
-  points: PointsData;
-  isPaid: boolean;
   onResult: (result: PsychTestResult) => void;
   onBack: () => void;
-  onUpdatePoints: (points: PointsData) => void;
 }
 
 const QUESTIONS: PsychTestQuestion[] = [
@@ -94,7 +90,7 @@ const QUESTIONS: PsychTestQuestion[] = [
   },
 ];
 
-export default function PsychologyTest({ userData, points, isPaid, onResult, onBack, onUpdatePoints }: Props) {
+export default function PsychologyTest({ userData, onResult, onBack }: Props) {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -102,8 +98,6 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
   const [error, setError] = useState<string | null>(null);
 
   const progress = ((currentQ) / QUESTIONS.length) * 100;
-  const remainingUses = getRemainingUses(points, "psych_test");
-  const costInfo = { cost: getFeatureCost("psych_test"), remaining: remainingUses };
 
   const handleSelect = async (value: string, optionIdx: number) => {
     // 완전 무료 모드: 포인트 체크 생략
@@ -160,32 +154,6 @@ export default function PsychologyTest({ userData, points, isPaid, onResult, onB
           <div className="brain-pulse">⚠️</div>
           <h2>심리테스트를 시작할 수 없어요</h2>
           <p>{error}</p>
-          {!isPaid && (
-            <div style={{
-              background: "rgba(102,126,234,0.12)",
-              border: "1px solid rgba(102,126,234,0.35)",
-              borderRadius: "12px",
-              padding: "12px 14px",
-              width: "100%",
-              maxWidth: "340px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "0.4rem"
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                <span>필요 복주머니</span>
-                <strong>🏮 {costInfo.cost}개</strong>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                <span>보유 복주머니</span>
-                <strong>🏮 {points.total_points}개</strong>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
-                <span>오늘 남은 횟수</span>
-                <strong>{costInfo.remaining}/5회</strong>
-              </div>
-            </div>
-          )}
           <button className="back-btn" onClick={onBack}>← 뒤로</button>
         </div>
       </div>

@@ -1,29 +1,21 @@
 import { useEffect, useState } from "react";
-import { UserData, DailyFortuneResult, PointsData } from "../types";
+import { UserData, DailyFortuneResult } from "../types";
 import { analyzeDailyFortune } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/DailyFortune.css";
 
 interface Props {
   userData: UserData;
-  points: PointsData;
-  isPaid: boolean;
   onResult: (result: DailyFortuneResult) => void;
   existingResult: DailyFortuneResult | null;
   onBack: () => void;
-  onUpdatePoints: (points: PointsData) => void;
 }
 
-export default function DailyFortune({ userData, points, isPaid, onResult, existingResult, onBack, onUpdatePoints }: Props) {
+export default function DailyFortune({ userData, onResult, existingResult, onBack }: Props) {
   const [result, setResult] = useState<DailyFortuneResult | null>(existingResult);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "hourly" | "lucky">("overview");
   const [error, setError] = useState<string | null>(null);
-  const [needsPayment, setNeedsPayment] = useState(false);
-
-  const remainingUses = getRemainingUses(points, "daily_fortune");
-  const costInfo = { cost: getFeatureCost("daily_fortune"), remaining: remainingUses };
 
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -103,11 +95,13 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
   if (!result) return null;
 
   const fortuneItems = [
-    { emoji: "💘", label: "연애운", score: result.love_score, text: result.love_text, color: "#ec4899", icon: "heart" },
-    { emoji: "💰", label: "재물운", score: result.money_score, text: result.money_text, color: "#d4af37", icon: "coin" },
-    { emoji: "💪", label: "건강운", score: result.health_score, text: result.health_text, color: "#10b981", icon: "health" },
-    { emoji: "👥", label: "대인관계", score: result.social_score, text: result.social_text, color: "#3b82f6", icon: "people" },
+    { emoji: "🌹", label: "연애운", score: result.love_score, text: result.love_text, color: "#ec4899" },
+    { emoji: "💎", label: "재물운", score: result.money_score, text: result.money_text, color: "#d4af37" },
+    { emoji: "🌿", label: "건강운", score: result.health_score, text: result.health_text, color: "#10b981" },
+    { emoji: "🏮", label: "대인관계", score: result.social_score, text: result.social_text, color: "#3b82f6" },
   ];
+
+  const starRating = result.star_rating ?? Math.round(result.mood_score / 20);
 
   const getScoreEmoji = (score: number) => {
     if (score >= 90) return "🌟";
@@ -153,7 +147,14 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
           </div>
         </div>
         <h2 className="mood-title">{result.mood_title}</h2>
-        <p className="mood-advice">{result.today_advice}</p>
+        <div className="star-rating">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span key={i} className={i < starRating ? "star filled" : "star"}>★</span>
+          ))}
+        </div>
+        <div className="today-advice-card">
+          <p className="today-advice-text">💬 {result.today_advice}</p>
+        </div>
       </section>
 
       {/* 탭 메뉴 */}
@@ -267,6 +268,27 @@ export default function DailyFortune({ userData, points, isPaid, onResult, exist
               <strong>행운의 방향</strong>
               <span className="lucky-value">{result.lucky_direction}</span>
             </div>
+            {result.lucky_food && (
+              <div className="lucky-card">
+                <span className="lucky-icon">🍱</span>
+                <strong>행운의 음식</strong>
+                <span className="lucky-value">{result.lucky_food}</span>
+              </div>
+            )}
+            {result.lucky_item && (
+              <div className="lucky-card">
+                <span className="lucky-icon">✨</span>
+                <strong>행운의 아이템</strong>
+                <span className="lucky-value">{result.lucky_item}</span>
+              </div>
+            )}
+            {result.lucky_keyword && (
+              <div className="lucky-card lucky-card-wide">
+                <span className="lucky-icon">🔑</span>
+                <strong>오늘의 키워드</strong>
+                <span className="lucky-value lucky-keyword">{result.lucky_keyword}</span>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -43,7 +43,7 @@
   - 구성: `TOSS_SECURITY_KEY` 환경 변수
 
 ### 2.2 정가 및 상품 설정
-- [ ] **VIP 구독 가격**: 4,900원 설정 확인
+- [ ] **VIP 구독 가격**: 9,900원 설정 확인 (Payment.tsx PREMIUM_CASH_PRICE = 9900 기준)
 - [ ] **상품명**: "타로 프리미엄 구독" 표시
 - [ ] **상품 설명**: 포함된 기능 명시
   - 예: "무제한 카드 해석, 카드 이력 보관" 등
@@ -66,7 +66,7 @@
 
 ### 3.1 API 키 관리
 - [ ] **세 가지 API 키 구분 확인** (절대 혼동 금지)
-  - ✅ **Gemini API**: 타로 해석 AI (`VITE_GEMINI_API_KEY`)
+  - ✅ **Gemini API**: 타로 해석 AI (서버: `GEMINI_API_KEY`, 프록시 URL: `VITE_GEMINI_PROXY_URL`)
   - ✅ **Toss Payments API**: 결제 처리 (`test_ck_...` / 실제 키)
   - ✅ **Apps in Toss 배포 키**: 앱 업로드 (`oK_ZqusZPZr3J8m3qJIau_1e1LMWdgfx5OsHZW9Jjug`)
 

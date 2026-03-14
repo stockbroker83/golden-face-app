@@ -13,7 +13,6 @@ import Compatibility from "./pages/Compatibility";
 import CompatibilityResultPage from "./pages/CompatibilityResultPage";
 import PsychologyTest from "./pages/PsychologyTest";
 import PsychTestResultPage from "./pages/PsychTestResultPage";
-import PointsPage from "./pages/PointsPage";
 import LuckyNumbers from "./pages/LuckyNumbers";
 import DigitalCharm from "./pages/DigitalCharm";
 import WishWall from "./pages/WishWall";
@@ -22,84 +21,46 @@ import DreamInterpretation from "./pages/DreamInterpretation";
 import LuckyStyle from "./pages/LuckyStyle";
 import Saju from "./pages/Saju";
 import SajuCompatibility from "./pages/SajuCompatibility";
+import TarotReading from "./pages/TarotReading";
 import {
   AppState,
   AppStep,
   FaceData,
   UserData,
-  PointsData,
   DailyFortuneResult,
   CompatibilityResult,
   PsychTestResult,
 } from "./types";
 import { analyzeFacePremium } from "./services/gemini";
 import { canUseAI, incrementMonthlyUsage } from "./utils/monthlyUsageManager";
-import { loadPoints, savePoints, addPoints, addStreak, deductPoints } from "./utils/pointsManager";
-import { fetchServerAccountState } from "./services/accountState";
 import { requestNotificationPermission } from "./utils/notificationManager";
 import "./App.css";
-
-const FREE_PREMIUM_MODE = true;
-
-const DEFAULT_POINTS: PointsData = {
-  total_points: 0,
-  today_earned: 0,
-  streak_days: 0,
-  last_daily_claim: "",
-  history: [],
-  daily_usage: {
-    date: "",
-    daily_fortune: 0,
-    compatibility: 0,
-    psych_test: 0,
-    saju: 0,
-    tarot_chat: 0,
-    face_reading_12: 0,
-  },
-};
 
 function App() {
   const [isPremiumAnalyzing, setIsPremiumAnalyzing] = useState(false);
   const [appState, setAppState] = useState<AppState>({
     user_data: null,
     face_data: null,
-    is_paid: FREE_PREMIUM_MODE,
+    is_paid: true,
     current_step: "notice",
     daily_fortune: null,
     compatibility: null,
     compatibility_partner: null,
     psych_test_result: null,
-    points: DEFAULT_POINTS,
   });
 
-  // 앱 초기화: 저장된 유저 데이터 & 포인트 복구
+  // 앱 초기화: 저장된 유저 데이터 복구
   useEffect(() => {
     const savedUser = localStorage.getItem("golden_face_user");
-    const savedPoints = loadPoints();
-
-    const hydrateFromServer = async () => {
-      const serverState = await fetchServerAccountState();
-      if (!serverState) return;
-
-      setAppState((prev) => ({
-        ...prev,
-        points: serverState.points || prev.points,
-        is_paid: FREE_PREMIUM_MODE,
-      }));
-    };
-
     if (savedUser) {
       try {
         const userData = JSON.parse(savedUser) as UserData;
         setAppState((prev) => ({
           ...prev,
           user_data: userData,
-          points: savedPoints || DEFAULT_POINTS,
-          is_paid: FREE_PREMIUM_MODE,
-          current_step: "hub", // 기존 유저는 바로 허브로
+          is_paid: true,
+          current_step: "hub",
         }));
-
-        void hydrateFromServer();
       } catch {}
     }
   }, []);
@@ -109,7 +70,7 @@ function App() {
     setAppState((prev) => ({
       ...prev,
       user_data: data,
-      current_step: "hub", // 허브로 이동 (기존: upload)
+      current_step: "upload",
     }));
   };
 
@@ -165,47 +126,11 @@ function App() {
     }
   }, [appState.face_data?.image_file, appState.user_data, isPremiumAnalyzing]);
 
-  // 포인트 적립 핸들러
-  const earnPoints = (amount: number, action: string, emoji: string) => {
-    const updated = addPoints(appState.points, amount, action, emoji);
-    savePoints(updated);
-    setAppState((prev) => ({ ...prev, points: updated }));
-  };
-
-  const spendPoints = (amount: number, action: string, emoji: string): boolean => {
-    const updated = deductPoints(appState.points, amount, action, emoji);
-    if (!updated) {
-      return false;
-    }
-    savePoints(updated);
-    setAppState((prev) => ({ ...prev, points: updated }));
-    return true;
-  };
-
-  const handleClaimDaily = () => {
-    const streakResult = addStreak(appState.points);
-    savePoints(streakResult.updated);
-    setAppState((prev) => ({ ...prev, points: streakResult.updated }));
-
-    if (streakResult.bonusPoints > 0) {
-      alert(`🎁 연속 출석 보너스 +${streakResult.bonusPoints}P`);
-    }
-    if (streakResult.unlockedPremium) {
-      alert("🏆 30일 연속 출석 달성! 프리미엄이 무료로 열렸습니다.");
-      setAppState((prev) => ({ ...prev, is_paid: true }));
-    }
-  };
-
-  // 데일리 관상 결과 저장
   const handleDailyResult = (result: DailyFortuneResult) => {
     setAppState((prev) => ({ ...prev, daily_fortune: result }));
   };
 
-  // 궁합 결과 저장
-  const handleCompatibilityResult = (
-    result: CompatibilityResult,
-    partner: UserData
-  ) => {
+  const handleCompatibilityResult = (result: CompatibilityResult, partner: UserData) => {
     setAppState((prev) => ({
       ...prev,
       compatibility: result,
@@ -214,7 +139,6 @@ function App() {
     }));
   };
 
-  // 심리테스트 결과 저장
   const handlePsychResult = (result: PsychTestResult) => {
     setAppState((prev) => ({
       ...prev,
@@ -234,25 +158,26 @@ function App() {
         <UserInfo onSubmit={updateUserData} />
       )}
 
-      {/* ── 메인 허브 (점신 스타일) ── */}
+      {/* ── 메인 허브 ── */}
       {appState.current_step === "hub" && appState.user_data && (
         <HomeHub
           userData={appState.user_data}
-          points={appState.points}
-          isPaid={appState.is_paid}
           onNavigate={goToStep}
-          onClaimDaily={handleClaimDaily}
         />
       )}
 
-      {/* ── 관상 분석 (기존 플로우) ── */}
+      {/* ── 관상 분석 ── */}
       {appState.current_step === "upload" && (
         <FaceUpload
           onUpload={(file) => {
             updateFaceData({ image_file: file });
             goToStep("analyzing");
           }}
-          onBack={() => goToStep("hub")}
+          onBack={() =>
+            appState.face_data?.free_analysis
+              ? goToStep("hub")
+              : goToStep("userinfo")
+          }
         />
       )}
 
@@ -264,7 +189,6 @@ function App() {
             onComplete={(result) => {
               updateFaceData({ ...appState.face_data, free_analysis: result });
               goToStep("free");
-              earnPoints(10, "관상 분석 완료", "👁️");
               requestNotificationPermission();
             }}
           />
@@ -282,13 +206,6 @@ function App() {
 
       {appState.current_step === "payment" && (
         <Payment
-          points={appState.points}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
           onPaymentSuccess={handlePaymentComplete}
           onBack={() => goToStep("free")}
         />
@@ -310,38 +227,22 @@ function App() {
           />
         )}
 
-      {/* ── 오늘의 관상 (NEW) ── */}
+      {/* ── 오늘의 관상 ── */}
       {appState.current_step === "daily" && appState.user_data && (
         <DailyFortune
           userData={appState.user_data}
-          points={appState.points}
-          isPaid={appState.is_paid}
           onResult={handleDailyResult}
           existingResult={appState.daily_fortune}
           onBack={() => goToStep("hub")}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
         />
       )}
 
-      {/* ── 궁합 분석 (NEW) ── */}
+      {/* ── 궁합 분석 ── */}
       {appState.current_step === "compatibility" && appState.user_data && (
         <Compatibility
           myData={appState.user_data}
-          points={appState.points}
-          isPaid={appState.is_paid}
           onResult={handleCompatibilityResult}
           onBack={() => goToStep("hub")}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
         />
       )}
 
@@ -355,20 +256,12 @@ function App() {
           />
         )}
 
-      {/* ── 심리테스트 (NEW) ── */}
+      {/* ── 심리테스트 ── */}
       {appState.current_step === "psychtest" && appState.user_data && (
         <PsychologyTest
           userData={appState.user_data}
-          points={appState.points}
-          isPaid={appState.is_paid}
           onResult={handlePsychResult}
           onBack={() => goToStep("hub")}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
         />
       )}
 
@@ -380,25 +273,10 @@ function App() {
           />
         )}
 
-      {/* ── 포인트 (NEW) ── */}
-      {appState.current_step === "points" && (
-        <PointsPage
-          points={appState.points}
-          onBack={() => goToStep("hub")}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
-        />
-      )}
-
       {appState.current_step === "lucky_numbers" && appState.user_data && (
         <LuckyNumbers
           userData={appState.user_data}
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
         />
       )}
 
@@ -406,14 +284,12 @@ function App() {
         <DigitalCharm
           userData={appState.user_data}
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
         />
       )}
 
       {appState.current_step === "wish_wall" && (
         <WishWall
           onBack={() => goToStep("hub")}
-          onSpendPoints={spendPoints}
         />
       )}
 
@@ -421,14 +297,12 @@ function App() {
         <TojeongBigyeol
           userData={appState.user_data}
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
         />
       )}
 
       {appState.current_step === "dream" && (
         <DreamInterpretation
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
         />
       )}
 
@@ -436,26 +310,24 @@ function App() {
         <LuckyStyle
           userData={appState.user_data}
           onBack={() => goToStep("hub")}
-          onEarnPoints={earnPoints}
         />
       )}
 
       {appState.current_step === "saju" && (
         <Saju
           onBack={() => goToStep("hub")}
-          points={appState.points}
-          isPaid={appState.is_paid}
-          onUpdatePoints={(updatedPoints: PointsData) => {
-            setAppState((prev) => ({
-              ...prev,
-              points: updatedPoints,
-            }));
-          }}
         />
       )}
 
       {appState.current_step === "saju_compatibility" && (
         <SajuCompatibility
+          onBack={() => goToStep("hub")}
+        />
+      )}
+
+      {appState.current_step === "tarot" && appState.user_data && (
+        <TarotReading
+          userData={appState.user_data}
           onBack={() => goToStep("hub")}
         />
       )}

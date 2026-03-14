@@ -103,6 +103,10 @@ export interface DailyFortuneResult {
   lucky_color: string;
   lucky_number: number;
   lucky_direction: string;
+  lucky_food?: string;
+  lucky_item?: string;
+  lucky_keyword?: string;
+  star_rating?: number;
   today_advice: string;
   hidden_opportunity?: string;
   avoid_actions?: string[];
@@ -170,41 +174,6 @@ export interface PsychTestResult {
   percentage: number;
 }
 
-// ─── 새 타입: 포인트/복주머니 시스템 ───
-export interface PointsData {
-  total_points: number;
-  today_earned: number;
-  streak_days: number;
-  last_daily_claim: string;
-  last_streak_date?: string;
-  longest_streak?: number;
-  history: PointHistory[];
-  daily_usage?: DailyUsage;
-}
-
-export interface DailyUsage {
-  date: string;
-  daily_fortune: number;
-  compatibility: number;
-  psych_test: number;
-  saju: number;
-  tarot_chat: number;
-  face_reading_12: number;
-}
-
-export interface StreakData {
-  current_streak: number;
-  last_check_date: string;
-  longest_streak: number;
-}
-
-export interface PointHistory {
-  date: string;
-  action: string;
-  points: number;
-  emoji: string;
-}
-
 // ─── 앱 상태 확장 ───
 export type AppStep =
   | "notice"
@@ -221,7 +190,6 @@ export type AppStep =
   | "compatibility_result"
   | "psychtest"
   | "psychtest_result"
-  | "points"
   | "lucky_numbers"
   | "charm"
   | "wish_wall"
@@ -229,7 +197,8 @@ export type AppStep =
   | "dream"
   | "lucky_style"
   | "saju"
-  | "saju_compatibility";
+  | "saju_compatibility"
+  | "tarot";
 
 export interface AppState {
   user_data: UserData | null;
@@ -240,5 +209,4 @@ export interface AppState {
   compatibility: CompatibilityResult | null;
   compatibility_partner: UserData | null;
   psych_test_result: PsychTestResult | null;
-  points: PointsData;
 }

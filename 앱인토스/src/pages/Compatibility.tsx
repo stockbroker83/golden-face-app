@@ -1,20 +1,16 @@
 import { useState } from "react";
-import { UserData, CompatibilityResult, PointsData } from "../types";
+import { UserData, CompatibilityResult } from "../types";
 import { analyzeCompatibility } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses, getFeatureCost } from "../utils/pointsManager";
 import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/Compatibility.css";
 
 interface Props {
   myData: UserData;
-  points: PointsData;
-  isPaid: boolean;
   onResult: (result: CompatibilityResult, partner: UserData) => void;
   onBack: () => void;
-  onUpdatePoints: (points: PointsData) => void;
 }
 
-export default function Compatibility({ myData, points, isPaid, onResult, onBack, onUpdatePoints }: Props) {
+export default function Compatibility({ myData, onResult, onBack }: Props) {
   const [partnerData, setPartnerData] = useState<Partial<UserData>>({
     birth_date: "",
     gender: myData.gender === "male" ? "female" : "male",
@@ -22,9 +18,6 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const remainingUses = getRemainingUses(points, "compatibility");
-  const costInfo = { cost: getFeatureCost("compatibility"), remaining: remainingUses };
 
   const handleSubmit = async () => {
     if (!partnerData.birth_date) {
@@ -69,7 +62,6 @@ export default function Compatibility({ myData, points, isPaid, onResult, onBack
           </div>
           <h2>두 분의 궁합을 분석하고 있어요</h2>
           <p>사주와 관상 기운을 비교 중...</p>
-          {!isPaid && <span className="cost-badge">🏮 -{costInfo.cost} 복주머니</span>}
           <div className="loading-dots">
             <span /><span /><span />
           </div>

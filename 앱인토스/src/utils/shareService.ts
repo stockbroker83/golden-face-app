@@ -1,20 +1,9 @@
-import { addPoints, loadPoints, savePoints } from "./pointsManager";
-import { PointsData } from "../types";
-
 interface SharePayload {
   title: string;
   text: string;
   imageBlob: Blob;
   fileName?: string;
 }
-
-const DEFAULT_POINTS: PointsData = {
-  total_points: 0,
-  today_earned: 0,
-  streak_days: 0,
-  last_daily_claim: "",
-  history: [],
-};
 
 async function tryTossShare(payload: SharePayload): Promise<boolean> {
   try {
@@ -81,12 +70,6 @@ function downloadFallback(payload: SharePayload) {
   URL.revokeObjectURL(url);
 }
 
-function awardSharePoints() {
-  const current = loadPoints() || DEFAULT_POINTS;
-  const updated = addPoints(current, 5, "결과 공유", "📤");
-  savePoints(updated);
-}
-
 export async function shareResult(payload: SharePayload): Promise<boolean> {
   const tossShared = await tryTossShare(payload);
   const webShared = tossShared ? true : await tryWebShare(payload);
@@ -95,6 +78,5 @@ export async function shareResult(payload: SharePayload): Promise<boolean> {
     downloadFallback(payload);
   }
 
-  awardSharePoints();
   return tossShared || webShared;
 }

@@ -1,4 +1,5 @@
 import { FreeAnalysisResult, PremiumAnalysisResult, UserData, DailyFortuneResult, CompatibilityResult, PsychTestResult } from "../types";
+import type { TarotResult } from "../pages/TarotReading";
 import type { TojeongResult } from "../pages/TojeongBigyeol";
 import type { DreamResult } from "../pages/DreamInterpretation";
 import type { SajuAnalysis, FourPillars } from "../utils/sajuCalculator";
@@ -536,6 +537,10 @@ export async function analyzeDailyFortune(
   "lucky_color": "파란색",
   "lucky_number": 7,
   "lucky_direction": "남동쪽",
+  "lucky_food": "두부된장국",
+  "lucky_item": "파란색 손수건",
+  "lucky_keyword": "신뢰",
+  "star_rating": 4,
   "today_advice": "오늘은 서두르지 말고 한 걸음씩 차근차근 진행하세요. 계획을 3개 이하로 줄이고 각각에 집중하면 성공률이 2배 높아집니다.",
   "hidden_opportunity": "오후 2-4시 사이에 예상치 못한 좋은 제안이나 연락이 올 수 있습니다. 이 시간대에는 전화를 받고 메시지를 바로 확인하세요.",
   "avoid_actions": ["중요한 계약서 서명", "큰 금액 송금", "감정적인 대화"],
@@ -581,6 +586,10 @@ function sanitizeDailyFortune(data: Partial<DailyFortuneResult>, today: string):
     lucky_color: String(data.lucky_color ?? "파란색"),
     lucky_number: Number(data.lucky_number) || 7,
     lucky_direction: String(data.lucky_direction ?? "남동쪽"),
+    lucky_food: data.lucky_food ? String(data.lucky_food) : undefined,
+    lucky_item: data.lucky_item ? String(data.lucky_item) : undefined,
+    lucky_keyword: data.lucky_keyword ? String(data.lucky_keyword) : undefined,
+    star_rating: data.star_rating ? Math.min(5, Math.max(1, Number(data.star_rating))) : undefined,
     today_advice: String(data.today_advice ?? "오늘 하루 긍정적인 마음을 유지하면 좋은 기회가 찾아올 거예요."),
     hidden_opportunity: String(data.hidden_opportunity ?? ""),
     avoid_actions: Array.isArray(data.avoid_actions) ? data.avoid_actions.map(String) : [],
@@ -1196,4 +1205,106 @@ function createMockSajuAI(): SajuAIResult {
 function createMockSajuCompatibilityAI(): SajuCompatibilityAIResult {
   return sanitizeSajuCompatibilityAI({});
 }
+
+// ═══════════════════════════════════════════
+// 타로 카드 리딩
+// ═══════════════════════════════════════════
+
+export async function analyzeTarot(userData: UserData): Promise<TarotResult> {
+  const today = new Date().toISOString().split("T")[0];
+
+  if (!HAS_GEMINI_PROXY) return createMockTarot();
+
+  try {
+    const prompt = `
+당신은 20년 경력의 타로 마스터이자 사주 명리학자입니다. 사주를 기반으로 오늘의 타로 3장을 리딩합니다.
+
+분석 대상:
+- 생년월일: ${userData.birth_date}
+- 성별: ${userData.gender === "male" ? "남성" : "여성"}
+- 오늘 날짜: ${today}
+
+타로 카드 78장 중 사주 에너지에 맞는 3장을 선택해 주세요.
+- 카드 1: 현재 상황 (지금 에너지)
+- 카드 2: 조언 (나아갈 방향)
+- 카드 3: 미래 전망 (앞으로의 흐름)
+
+각 카드 설명은 구체적이고 실용적으로, 2-3문장으로 작성하세요.
+카드 이름은 한국어로 (예: "태양", "달", "마법사", "황제", "여황제", "운명의 수레바퀴", "별", "탑", "심판" 등)
+
+반드시 JSON만 출력하세요:
+{
+  "spread_theme": "오늘 ${userData.name || "당신"}의 타로 리딩",
+  "cards": [
+    {
+      "name": "태양",
+      "emoji": "☀️",
+      "position": "현재",
+      "keyword": "활력, 성공",
+      "message": "지금 당신에게는 밝은 에너지가 넘칩니다. 자신감을 갖고 앞으로 나아가세요. 주변 사람들에게 긍정적인 영향을 미치는 시기입니다.",
+      "is_positive": true
+    },
+    {
+      "name": "은둔자",
+      "emoji": "🏔️",
+      "position": "조언",
+      "keyword": "성찰, 내면",
+      "message": "지금은 혼자만의 시간을 갖고 내면의 소리에 귀 기울이세요. 서두르지 말고 차분히 생각을 정리하는 것이 최선입니다. 깊은 성찰이 새로운 길을 열어줄 거예요.",
+      "is_positive": true
+    },
+    {
+      "name": "별",
+      "emoji": "⭐",
+      "position": "미래",
+      "keyword": "희망, 치유",
+      "message": "희망과 치유의 에너지가 다가오고 있습니다. 노력한 것들이 빛을 발하며 원하던 방향으로 흘러갈 것입니다. 믿음을 잃지 마세요.",
+      "is_positive": true
+    }
+  ],
+  "overall_message": "오늘의 타로는 내면의 힘을 믿고 꾸준히 나아가라는 메시지를 전합니다. 현재의 밝은 에너지를 잘 활용하여 신중하게 행동하면, 앞으로 희망찬 결과가 기다리고 있습니다."
+}
+`;
+
+    const text = await requestGeminiText(prompt, { timeoutMs: 25000 });
+    const parsed = JSON.parse(text.replace(/```json\n?|\n?```/g, "").trim()) as TarotResult;
+    if (!parsed?.cards || parsed.cards.length !== 3) throw new Error("카드 형식 오류");
+    return parsed;
+  } catch {
+    return createMockTarot();
+  }
+}
+
+function createMockTarot(): TarotResult {
+  return {
+    spread_theme: "오늘의 타로 리딩",
+    cards: [
+      {
+        name: "태양",
+        emoji: "☀️",
+        position: "현재",
+        keyword: "활력, 성공",
+        message: "지금 당신에게는 밝은 에너지가 가득합니다. 긍정적인 마음으로 하루를 시작하세요. 주변에서 좋은 소식이 들려올 수 있습니다.",
+        is_positive: true,
+      },
+      {
+        name: "은둔자",
+        emoji: "🏔️",
+        position: "조언",
+        keyword: "성찰, 내면",
+        message: "잠시 멈추고 자신의 내면을 들여다볼 시간입니다. 서두르지 말고 천천히 생각을 정리하세요. 혼자만의 시간이 큰 지혜를 가져다 줄 거예요.",
+        is_positive: true,
+      },
+      {
+        name: "별",
+        emoji: "⭐",
+        position: "미래",
+        keyword: "희망, 치유",
+        message: "희망과 새로운 가능성이 다가오고 있습니다. 지금의 노력이 반드시 빛을 발할 것입니다. 믿음을 잃지 말고 계속 나아가세요.",
+        is_positive: true,
+      },
+    ],
+    overall_message: "오늘의 타로는 내면의 힘을 믿고 꾸준히 나아가라는 메시지를 전합니다. 지금의 밝은 에너지를 잘 활용하여 신중하게 행동하면, 앞으로 희망찬 결과가 기다리고 있습니다.",
+  };
+}
+
 

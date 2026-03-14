@@ -7,7 +7,6 @@ import "../styles/ExtraFeatures.css";
 interface Props {
   userData: UserData;
   onBack: () => void;
-  onEarnPoints: (amount: number, action: string, emoji: string) => void;
 }
 
 export interface TojeongResult {
@@ -20,7 +19,7 @@ export interface TojeongResult {
   year_advice: string;
 }
 
-export default function TojeongBigyeol({ userData, onBack, onEarnPoints }: Props) {
+export default function TojeongBigyeol({ userData, onBack }: Props) {
   const [result, setResult] = useState<TojeongResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedMonth, setExpandedMonth] = useState<number | null>(null);
@@ -36,7 +35,6 @@ export default function TojeongBigyeol({ userData, onBack, onEarnPoints }: Props
         const data = await analyzeTojeong(userData);
         incrementMonthlyUsage();
         setResult(data);
-        onEarnPoints(15, "토정비결 확인", "📜");
       } catch (err) {
         console.error("토정비결 분석 실패:", err);
       } finally {

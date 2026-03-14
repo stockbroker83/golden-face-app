@@ -1,19 +1,14 @@
 import { useState } from "react";
-import { PointsData } from "../types";
 import { analyzeSaju, type SajuAnalysis, type WuXing } from "../utils/sajuCalculator";
 import { analyzeSajuWithAI, type SajuAIResult } from "../services/gemini";
-import { canUseFeature, useFeature, savePoints, getRemainingUses } from "../utils/pointsManager";
 import { canUseAI, incrementMonthlyUsage } from "../utils/monthlyUsageManager";
 import "../styles/ExtraFeatures.css";
 
 interface SajuProps {
   onBack: () => void;
-  points: PointsData;
-  isPaid: boolean;
-  onUpdatePoints: (points: PointsData) => void;
 }
 
-export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuProps) {
+export default function Saju({ onBack }: SajuProps) {
   const [step, setStep] = useState<'input' | 'result'>('input');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +22,6 @@ export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuPro
 
   const [sajuAnalysis, setSajuAnalysis] = useState<SajuAnalysis | null>(null);
   const [aiResult, setAiResult] = useState<SajuAIResult | null>(null);
-  const remainingUses = getRemainingUses(points, "saju");
 
   const handleAnalyze = async () => {
     setError(null);
@@ -305,22 +299,6 @@ export default function Saju({ onBack, points, isPaid, onUpdatePoints }: SajuPro
       <div className="extra-content">
         <div className="result-card">
           <h3>생년월일시 입력</h3>
-
-          {!isPaid && (
-            <div style={{
-              marginTop: '1rem',
-              background: 'rgba(99, 102, 241, 0.12)',
-              border: '1px solid rgba(99, 102, 241, 0.35)',
-              borderRadius: '12px',
-              padding: '0.75rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontSize: '0.85rem'
-            }}>
-              <span>이용비용: 🏮 100개</span>
-              <span>오늘 남은 횟수: {remainingUses}/2회</span>
-            </div>
-          )}
 
           {error && (
             <div style={{
